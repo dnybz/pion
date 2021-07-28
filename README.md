@@ -1,11 +1,8 @@
 Pion Network Library
 ====================
 
-C++ framework for building lightweight HTTP interfaces
+Embedded HTTP server based on a source code from https://github.com/splunk/pion
 
-[![Build Status](https://travis-ci.org/splunk/pion.svg?branch=master)](https://travis-ci.org/splunk/pion)
-
-**Project Home:** https://github.com/splunk/pion
 
 Retrieving the code
 -------------------
