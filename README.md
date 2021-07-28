@@ -3,14 +3,14 @@ Pion Network Library
 
 C++ framework for building lightweight HTTP interfaces
 
-[![Build Status](https://travis-ci.org/splunk/pion.svg?branch=develop)](https://travis-ci.org/splunk/pion)
+[![Build Status](https://travis-ci.org/splunk/pion.svg?branch=master)](https://travis-ci.org/splunk/pion)
 
 **Project Home:** https://github.com/splunk/pion
 
 Retrieving the code
 -------------------
 
-    git clone https://github.com/splunk/pion.git
+    git clone https://github.com/dnybz/pion.git
     cd pion
 
 
@@ -45,30 +45,12 @@ To generate build call
 
     cmake <path to pion clone> [-G <generator name>] [-D<option>...]
 
-for example to generate MSVS2012 Win64 solution run
-
-    git clone git@github.com:splunk/pion.git
-    cd pion/build
-    cmake .. -G"Visual Studio 11 Win64"
-
-this will create pion_solution.sln for MSVS2012/Win64
-
-if cmake can't find dependency, use -D<option> to control Find<library> modules search behaviour
-    
-    -DBOOST_ROOT=<path to installed boost libraries>
-    -DZLIB_ROOT=<path to installed zlib>
-    -DOPENSSL_ROOT_DIR=...
-    -DLOG4CPLUS_ROOT=...
+for example to generate msvc2017 Win32 solution
+pion\pion.sln
 
 Third Party Libraries
 ---------------------
-
-Pion *requires* the [Boost C++ libraries](http://www.boost.org/) version 1.35
-or greater. Please see the `README.boost` file within the `doc` subdirectory
-for instructions on how to download, build and install Boost.
-
 For logging, Pion may be configured to:
-
 * use std::cout and std::cerr for logging (the default configuration)
 
 * use one of the following open source libraries:
@@ -84,7 +66,7 @@ supported by Pion within the `doc` subdirectory (`README.platform`).
 
 License
 -------
-
+Copyright &copy; 2021 Wang Qiang
 Copyright &copy; 2007-2016 Splunk Inc.
 
 The Pion Network Library is published under the
