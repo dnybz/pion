@@ -19,7 +19,7 @@ Building the code
 
 *For XCode:* use `pion.xcodeproj`
 
-*For Visual Studio:* use `pion.sln`
+*For Visual Studio 2017 or later:* use `pion.sln`
 
 On Unix platforms (including Linux, OSX, etc.) you can run
 
@@ -44,9 +44,10 @@ Pion required cmake version 2.8.10+
 To generate build call 
 
     cmake <path to pion clone> [-G <generator name>] [-D<option>...]
-
-for example to generate msvc2017 Win32 solution
-pion\pion.sln
+    
+`-DZLIB_ROOT=<path to installed zlib>
+-DOPENSSL_ROOT_DIR=...
+-DLOG4CPLUS_ROOT=...`
 
 Third Party Libraries
 ---------------------
