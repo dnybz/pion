@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------
 # pion:  a Boost C++ framework for building lightweight HTTP interfaces
 # ---------------------------------------------------------------------
+# Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 # Copyright (C) 2013 Splunk Inc.  (https://github.com/splunk/pion)
 #
 # Distributed under the Boost Software License, Version 1.0.
@@ -57,6 +58,9 @@ set(COMMON_HDR_FILES
     ${PROJECT_WIDE_INCLUDE}/pion/process.hpp
     ${PROJECT_WIDE_INCLUDE}/pion/scheduler.hpp
     ${PROJECT_WIDE_INCLUDE}/pion/user.hpp
+	${PROJECT_WIDE_INCLUDE}/pion/tribool.hpp
+	${PROJECT_WIDE_INCLUDE}/pion/string_utils.hpp
+	${PROJECT_WIDE_INCLUDE}/pion/noncopyable.hpp
     )
 source_group("include\\pion" FILES ${COMMON_HDR_FILES})
 
@@ -80,6 +84,7 @@ set(SRC_FILES
     ${PROJECT_SOURCE_DIR}/scheduler.cpp
     ${PROJECT_SOURCE_DIR}/tcp_server.cpp
     ${PROJECT_SOURCE_DIR}/tcp_timer.cpp
+	${PROJECT_SOURCE_DIR}/string_utils.cpp
     )
 
 if (BUILD_SPDY)

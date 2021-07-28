@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -12,8 +13,7 @@
 
 #include <set>
 #include <map>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 #include <pion/error.hpp>
 #include <pion/logger.hpp>
@@ -21,7 +21,6 @@
 #include <pion/tcp/connection.hpp>
 #include <pion/user.hpp>
 #include <pion/http/request.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>    // order important, otherwise compiling error under win32
 
 
 namespace pion {    // begin namespace pion
@@ -32,7 +31,7 @@ namespace http {    // begin namespace http
 /// auth: a base class for handling HTTP Authentication and session management
 ///
 class PION_API auth :
-    private boost::noncopyable
+    private pion::noncopyable
 {
 public:
     
@@ -66,7 +65,7 @@ public:
      * @param value the value of the option
      */
     virtual void set_option(const std::string& name, const std::string& /* value */) {
-        BOOST_THROW_EXCEPTION( error::bad_arg() << error::errinfo_arg_name(name) );
+		std::cout << "bad_arg: " << name << std::endl;
     }
     
     /**
@@ -124,7 +123,7 @@ protected:
     typedef std::set<std::string>   resource_set_type;
 
     /// data type used to map authentication credentials to user objects
-    typedef std::map<std::string,std::pair<boost::posix_time::ptime,user_ptr> >  user_cache_type;
+    typedef std::map<std::string,std::pair<std::chrono::time_point<std::chrono::system_clock>,user_ptr> >  user_cache_type;
     
     
     /**
@@ -162,11 +161,11 @@ protected:
     resource_set_type       m_white_list;
 
     /// mutex used to protect access to the resources
-    mutable boost::mutex    m_resource_mutex;
+    mutable std::mutex    m_resource_mutex;
 };
 
 /// data type for a auth pointer
-typedef boost::shared_ptr<auth> auth_ptr;
+typedef std::shared_ptr<auth> auth_ptr;
 
 
 }   // end namespace http

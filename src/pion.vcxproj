@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_DLL_full|Win32">
       <Configuration>Debug_DLL_full</Configuration>
@@ -38,39 +38,40 @@
     <ProjectGuid>{61F4B4D5-3608-4264-9F4B-B0DA3E3FDF62}</ProjectGuid>
     <RootNamespace>pion-net</RootNamespace>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL_full|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL_full|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_static|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_static|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL_full|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL_full|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_static|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_static|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -157,7 +158,8 @@
       <Command>copy /Y $(SolutionDir)include\pion\config.hpp.win $(SolutionDir)include\pion\config.hpp</Command>
     </PreBuildEvent>
     <ClCompile>
-      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\third_party\asio\include;..\third_party\zlib;..\third_party\;C:\OpenSSL-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_static|x64'">
@@ -179,8 +181,9 @@
       <Command>copy /Y $(SolutionDir)include\pion\config.hpp.win $(SolutionDir)include\pion\config.hpp</Command>
     </PreBuildEvent>
     <ClCompile>
-      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>..\third_party\asio\include;..\third_party\zlib;..\third_party\;C:\OpenSSL-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_static|x64'">
@@ -202,13 +205,15 @@
       <Command>copy /Y $(SolutionDir)include\pion\config.hpp.win $(SolutionDir)include\pion\config.hpp</Command>
     </PreBuildEvent>
     <ClCompile>
-      <PreprocessorDefinitions>PION_EXPORTS;PION_FULL;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PION_EXPORTS;PION_FULL;_USRDLL;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\third_party\asio\include;..\third_party\zlib;..\third_party\;C:\OpenSSL-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <AdditionalDependencies>zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\third_party\zlib;C:\OpenSSL-Win32\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_DLL_full|x64'">
@@ -237,13 +242,15 @@
       <Command>copy /Y $(SolutionDir)include\pion\config.hpp.win $(SolutionDir)include\pion\config.hpp</Command>
     </PreBuildEvent>
     <ClCompile>
-      <PreprocessorDefinitions>PION_EXPORTS;PION_FULL;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PION_EXPORTS;PION_FULL;_USRDLL;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\third_party\asio\include;..\third_party\zlib;..\third_party\;C:\OpenSSL-Win32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <AdditionalDependencies>zdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\third_party\zlib;C:\OpenSSL-Win32\lib\VC;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_DLL_full|x64'">
@@ -278,27 +285,32 @@
     <ClCompile Include="http_server.cpp" />
     <ClCompile Include="http_types.cpp" />
     <ClCompile Include="http_writer.cpp" />
+    <ClCompile Include="logger.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="process.cpp" />
     <ClCompile Include="scheduler.cpp" />
     <ClCompile Include="spdy_decompressor.cpp" />
     <ClCompile Include="spdy_parser.cpp" />
+    <ClCompile Include="string_utils.cpp" />
     <ClCompile Include="tcp_server.cpp" />
     <ClCompile Include="tcp_timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\pion\admin_rights.hpp" />
     <ClInclude Include="..\include\pion\algorithm.hpp" />
+    <ClInclude Include="..\include\pion\config.hpp" />
     <ClInclude Include="..\include\pion\error.hpp" />
     <ClInclude Include="..\include\pion\http\auth.hpp" />
     <ClInclude Include="..\include\pion\http\basic_auth.hpp" />
     <ClInclude Include="..\include\pion\http\plugin_server.hpp" />
     <ClInclude Include="..\include\pion\http\plugin_service.hpp" />
     <ClInclude Include="..\include\pion\logger.hpp" />
+    <ClInclude Include="..\include\pion\noncopyable.hpp" />
     <ClInclude Include="..\include\pion\plugin_manager.hpp" />
     <ClInclude Include="..\include\pion\spdy\decompressor.hpp" />
     <ClInclude Include="..\include\pion\spdy\parser.hpp" />
     <ClInclude Include="..\include\pion\spdy\types.hpp" />
+    <ClInclude Include="..\include\pion\string_utils.hpp" />
     <ClInclude Include="..\include\pion\tcp\connection.hpp" />
     <ClInclude Include="..\include\pion\http\cookie_auth.hpp" />
     <ClInclude Include="..\include\pion\hash_map.hpp" />
@@ -320,7 +332,6 @@
     <ClInclude Include="..\include\pion\tcp\timer.hpp" />
     <ClInclude Include="..\include\pion\http\types.hpp" />
     <ClInclude Include="..\include\pion\http\writer.hpp" />
-    <ClInclude Include="..\include\pion\test\unit_test.hpp" />
     <ClInclude Include="..\include\pion\user.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

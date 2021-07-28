@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -11,12 +12,13 @@
 #define __PION_PLUGIN_SERVICE_HEADER__
 
 #include <string>
-#include <boost/noncopyable.hpp>
+#include <iostream>
 #include <pion/config.hpp>
 #include <pion/error.hpp>
 #include <pion/algorithm.hpp>
 #include <pion/http/request.hpp>
 #include <pion/tcp/connection.hpp>
+#include <pion/noncopyable.hpp>
 
 
 namespace pion {    // begin namespace pion
@@ -27,7 +29,7 @@ namespace http {    // begin namespace http
 /// plugin_service: interface class for web services
 /// 
 class plugin_service :
-    private boost::noncopyable
+    private pion::noncopyable
 {
 public:
 
@@ -52,7 +54,7 @@ public:
      * @param value the value of the option
      */
     virtual void set_option(const std::string& name, const std::string& /* value */) {
-        BOOST_THROW_EXCEPTION( error::bad_arg() << error::errinfo_arg_name(name) );
+		std::cout << "bad_arg: " << name << std::endl;
     }
     
     /// called when the web service's server is starting

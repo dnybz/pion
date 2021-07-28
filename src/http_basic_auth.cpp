@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <boost/algorithm/string.hpp>
+#include <pion/string_utils.hpp>
 #include <pion/algorithm.hpp>
 #include <pion/http/basic_auth.hpp>
 #include <pion/http/response_writer.hpp>
@@ -27,7 +28,7 @@ const unsigned int  basic_auth::CACHE_EXPIRATION = 300;  // 5 minutes
 
 basic_auth::basic_auth(user_manager_ptr userManager, const std::string& realm)
     : http::auth(userManager), m_realm(realm),
-    m_cache_cleanup_time(boost::posix_time::second_clock::universal_time())
+	m_cache_cleanup_time(std::chrono::system_clock::now())
 {
     set_logger(PION_GET_LOGGER("pion.http.basic_auth"));
 }
@@ -38,16 +39,16 @@ bool basic_auth::handle_request(const http::request_ptr& http_request_ptr, const
         return true; // this request does not require authentication
     }
     
-    boost::posix_time::ptime time_now(boost::posix_time::second_clock::universal_time());
-    if (time_now > m_cache_cleanup_time + boost::posix_time::seconds(CACHE_EXPIRATION)) {
+	std::chrono::time_point<std::chrono::system_clock> time_now(std::chrono::system_clock::now());
+    if (time_now > m_cache_cleanup_time + std::chrono::seconds(CACHE_EXPIRATION)) {
         // expire cache
-        boost::mutex::scoped_lock cache_lock(m_cache_mutex);
+        std::unique_lock<std::mutex> cache_lock(m_cache_mutex);
         user_cache_type::iterator i;
         user_cache_type::iterator next=m_user_cache.begin();
         while (next!=m_user_cache.end()) {
             i=next;
             ++next;
-            if (time_now > i->second.first + boost::posix_time::seconds(CACHE_EXPIRATION)) {
+            if (time_now > i->second.first + std::chrono::seconds(CACHE_EXPIRATION)) {
                 // ok - this is an old record.. expire it now
                 m_user_cache.erase(i);
             }
@@ -61,7 +62,7 @@ bool basic_auth::handle_request(const http::request_ptr& http_request_ptr, const
         std::string credentials;
         if (parse_authorization(authorization, credentials)) {
             // to do - use fast cache to match with active credentials
-            boost::mutex::scoped_lock cache_lock(m_cache_mutex);
+            std::unique_lock<std::mutex> cache_lock(m_cache_mutex);
             user_cache_type::iterator user_cache_ptr=m_user_cache.find(credentials);
             if (user_cache_ptr!=m_user_cache.end()) {
                 // we found the credentials in our cache...
@@ -95,15 +96,15 @@ bool basic_auth::handle_request(const http::request_ptr& http_request_ptr, const
     
 void basic_auth::set_option(const std::string& name, const std::string& value) 
 {
-    if (name=="realm")
-        m_realm = value;
-    else
-        BOOST_THROW_EXCEPTION( error::bad_arg() << error::errinfo_arg_name(name) );
+	if (name == "realm")
+		m_realm = value;
+	else
+		std::cout << "bad_arg: " << name << std::endl;
 }
     
 bool basic_auth::parse_authorization(const std::string& authorization, std::string &credentials)
 {
-    if (!boost::algorithm::starts_with(authorization, "Basic "))
+    if (!utils::starts_with(authorization, "Basic "))
         return false;
     credentials = authorization.substr(6);
     if (credentials.empty())
@@ -145,7 +146,7 @@ void basic_auth::handle_unauthorized(const http::request_ptr& http_request_ptr,
         "<BODY><H1>401 Unauthorized.</H1></BODY>"
         "</HTML> ";
     http::response_writer_ptr writer(http::response_writer::create(tcp_conn, *http_request_ptr,
-                                                                   boost::bind(&tcp::connection::finish, tcp_conn)));
+                                                                   std::bind(&tcp::connection::finish, tcp_conn)));
     writer->get_response().set_status_code(http::types::RESPONSE_CODE_UNAUTHORIZED);
     writer->get_response().set_status_message(http::types::RESPONSE_MESSAGE_UNAUTHORIZED);
     writer->get_response().add_header("WWW-Authenticate", "Basic realm=\"" + m_realm + "\"");

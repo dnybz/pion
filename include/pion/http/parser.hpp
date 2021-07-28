@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -11,18 +12,13 @@
 #define __PION_HTTP_PARSER_HEADER__
 
 #include <string>
-#include <boost/noncopyable.hpp>
-#include <boost/function/function2.hpp>
-#include <boost/logic/tribool.hpp>
-#include <boost/system/error_code.hpp>
-#include <boost/thread/once.hpp>
+#include <mutex>
+#include <pion/tribool.hpp>
+#include <pion/noncopyable.hpp>
+#include <pion/string_utils.hpp>
 #include <pion/config.hpp>
 #include <pion/logger.hpp>
 #include <pion/http/message.hpp>
-
-#ifndef BOOST_SYSTEM_NOEXCEPT
-    #define BOOST_SYSTEM_NOEXCEPT BOOST_NOEXCEPT
-#endif
 
 
 namespace pion {    // begin namespace pion
@@ -37,7 +33,7 @@ class response;
 /// parser: parses HTTP messages
 ///
 class PION_API parser :
-    private boost::noncopyable
+    private pion::noncopyable
 {
 
 public:
@@ -46,7 +42,7 @@ public:
     static const std::size_t        DEFAULT_CONTENT_MAX;
 
     /// callback type used to consume payload content
-    typedef boost::function2<void, const char *, std::size_t>   payload_handler_t;
+	typedef std::function<void(const char *, std::size_t)>  payload_handler_t;
     
     /// class-specific error code values
     enum error_value_t {
@@ -72,10 +68,10 @@ public:
     
     /// class-specific error category
     class error_category_t
-        : public boost::system::error_category
+        : public std::error_category
     {
     public:
-        const char *name() const BOOST_SYSTEM_NOEXCEPT { return "parser"; }
+        const char *name() const PION_NOEXCEPT { return "parser"; }
         std::string message(int ev) const {
             switch (ev) {
             case ERROR_METHOD_CHAR:
@@ -147,12 +143,12 @@ public:
      * @param http_msg the HTTP message object to populate from parsing
      * @param ec error_code contains additional information for parsing errors
      *
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing HTTP message,
      *                        indeterminate = not yet finished parsing HTTP message
      */
-    boost::tribool parse(http::message& http_msg, boost::system::error_code& ec);
+    pion::tribool parse(http::message& http_msg, asio::error_code& ec);
 
     /**
      * attempts to continue parsing despite having missed data (length is known but content is not)
@@ -161,13 +157,13 @@ public:
      * @param len the length in bytes of the missing data
      * @param ec error_code contains additional information for parsing errors
      *
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing HTTP message,
      *                        indeterminate = not yet finished parsing HTTP message
      */
-    boost::tribool parse_missing_data(http::message& http_msg, std::size_t len,
-        boost::system::error_code& ec);
+    pion::tribool parse_missing_data(http::message& http_msg, std::size_t len,
+        asio::error_code& ec);
 
     /**
      * finishes parsing an HTTP response message
@@ -201,7 +197,7 @@ public:
     /**
      * checks to see if a premature EOF was encountered while parsing.  This
      * should be called if there is no more data to parse, and if the last
-     * call to the parse() function returned boost::indeterminate
+     * call to the parse() function returned pion::indeterminate
      *
      * @param http_msg the HTTP message object being parsed
      * @return true if premature EOF, false if message is OK & finished parsing
@@ -228,7 +224,7 @@ public:
      * @param http_msg the HTTP message object being parsed
      */
     inline void skip_header_parsing(http::message& http_msg) {
-        boost::system::error_code ec;
+        asio::error_code ec;
         finish_header_parsing(http_msg, ec);
     }
     
@@ -311,7 +307,7 @@ public:
      * @return true if the URI was successfully parsed, false if there was an error
      */
     static bool parse_uri(const std::string& uri, std::string& proto, 
-                         std::string& host, boost::uint16_t& port, std::string& path,
+                         std::string& host, uint16_t& port, std::string& path,
                          std::string& query);
 
     /**
@@ -434,13 +430,13 @@ public:
      * @param http_msg the HTTP message object to populate from parsing
      * @param ec error_code contains additional information for parsing errors
      *
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing HTTP message (no content),
      *                        indeterminate = payload content is available to be parsed
      */
-    boost::tribool finish_header_parsing(http::message& http_msg,
-                                         boost::system::error_code& ec);
+    pion::tribool finish_header_parsing(http::message& http_msg,
+                                         asio::error_code& ec);
 
     /**
      * parses an X-Forwarded-For HTTP header, and extracts from it an IP
@@ -455,7 +451,7 @@ public:
     
     /// returns an instance of parser::error_category_t
     static inline error_category_t& get_error_category(void) {
-        boost::call_once(parser::create_error_category, m_instance_flag);
+        std::call_once(m_instance_flag, parser::create_error_category);
         return *m_error_category_ptr;
     }
 
@@ -463,7 +459,7 @@ public:
 protected:
 
     /// Called after we have finished parsing the HTTP message headers
-    virtual void finished_parsing_headers(const boost::system::error_code& /* ec */) {}
+    virtual void finished_parsing_headers(const asio::error_code& /* ec */) {}
     
     /**
      * parses an HTTP message up to the end of the headers using bytes 
@@ -472,12 +468,12 @@ protected:
      * @param http_msg the HTTP message object to populate from parsing
      * @param ec error_code contains additional information for parsing errors
      *
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing HTTP headers,
      *                        indeterminate = not yet finished parsing HTTP headers
      */
-    boost::tribool parse_headers(http::message& http_msg, boost::system::error_code& ec);
+    pion::tribool parse_headers(http::message& http_msg, asio::error_code& ec);
 
     /**
      * updates an http::message object with data obtained from parsing headers
@@ -492,13 +488,13 @@ protected:
      * @param chunk_buffers buffers to be populated from parsing chunked content
      * @param ec error_code contains additional information for parsing errors
      *
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing message,
      *                        indeterminate = message is not yet finished
      */
-    boost::tribool parse_chunks(http::message::chunk_cache_t& chunk_buffers,
-        boost::system::error_code& ec);
+    pion::tribool parse_chunks(http::message::chunk_cache_t& chunk_buffers,
+        asio::error_code& ec);
 
     /**
      * consumes payload content in the parser's read buffer 
@@ -506,13 +502,13 @@ protected:
      * @param http_msg the HTTP message object to consume content for
      * @param ec error_code contains additional information for parsing errors
      *  
-     * @return boost::tribool result of parsing:
+     * @return pion::tribool result of parsing:
      *                        false = message has an error,
      *                        true = finished parsing message,
      *                        indeterminate = message is not yet finished
      */
-    boost::tribool consume_content(http::message& http_msg,
-        boost::system::error_code& ec);
+    pion::tribool consume_content(http::message& http_msg,
+        asio::error_code& ec);
 
     /**
      * consume the bytes available in the read buffer, converting them into
@@ -536,8 +532,8 @@ protected:
      * @param ec error code variable to define
      * @param ev error value to raise
      */
-    static inline void set_error(boost::system::error_code& ec, error_value_t ev) {
-        ec = boost::system::error_code(static_cast<int>(ev), get_error_category());
+    static inline void set_error(asio::error_code& ec, error_value_t ev) {
+        ec = asio::error_code(static_cast<int>(ev), get_error_category());
     }
 
     /// creates the unique parser error_category_t
@@ -554,34 +550,34 @@ protected:
 
 
     /// maximum length for response status message
-    static const boost::uint32_t        STATUS_MESSAGE_MAX;
+    static const uint32_t        STATUS_MESSAGE_MAX;
 
     /// maximum length for the request method
-    static const boost::uint32_t        METHOD_MAX;
+    static const uint32_t        METHOD_MAX;
 
     /// maximum length for the resource requested
-    static const boost::uint32_t        RESOURCE_MAX;
+    static const uint32_t        RESOURCE_MAX;
 
     /// maximum length for the query string
-    static const boost::uint32_t        QUERY_STRING_MAX;
+    static const uint32_t        QUERY_STRING_MAX;
 
     /// maximum length for an HTTP header name
-    static const boost::uint32_t        HEADER_NAME_MAX;
+    static const uint32_t        HEADER_NAME_MAX;
 
     /// maximum length for an HTTP header value
-    static const boost::uint32_t        HEADER_VALUE_MAX;
+    static const uint32_t        HEADER_VALUE_MAX;
 
     /// maximum length for the name of a query string variable
-    static const boost::uint32_t        QUERY_NAME_MAX;
+    static const uint32_t        QUERY_NAME_MAX;
 
     /// maximum length for the value of a query string variable
-    static const boost::uint32_t        QUERY_VALUE_MAX;
+    static const uint32_t        QUERY_VALUE_MAX;
 
     /// maximum length for the name of a cookie name
-    static const boost::uint32_t        COOKIE_NAME_MAX;
+    static const uint32_t        COOKIE_NAME_MAX;
 
     /// maximum length for the value of a cookie; also used for path and domain
-    static const boost::uint32_t        COOKIE_VALUE_MAX;
+    static const uint32_t        COOKIE_VALUE_MAX;
 
 
     /// primary logging interface used by this class
@@ -646,7 +642,7 @@ private:
     payload_handler_t                   m_payload_handler;
 
     /// Used for parsing the HTTP response status code
-    boost::uint16_t                     m_status_code;
+    uint16_t                     m_status_code;
 
     /// Used for parsing the HTTP response status message
     std::string                         m_status_message;
@@ -703,7 +699,7 @@ private:
     static error_category_t *           m_error_category_ptr;
         
     /// used to ensure thread safety of the parser error_category_t
-    static boost::once_flag             m_instance_flag;
+    static std::once_flag             m_instance_flag;
 };
 
 
@@ -752,14 +748,14 @@ inline bool parser::is_cookie_attribute(const std::string& name, bool set_cookie
             // which is obsolete, allowed multiple comma separated cookies.
             // parse_cookie_header() is very conservatively assuming that any <name>=<value> pair in a
             // Set-Cookie header is a cookie-pair unless <name> is a known cookie attribute.
-               boost::algorithm::iequals(name, "Comment")
-            || boost::algorithm::iequals(name, "Domain")
-            || boost::algorithm::iequals(name, "Max-Age")
-            || boost::algorithm::iequals(name, "Path")
-            || boost::algorithm::iequals(name, "Secure")
-            || boost::algorithm::iequals(name, "Version")
-            || boost::algorithm::iequals(name, "Expires")
-            || boost::algorithm::iequals(name, "HttpOnly")
+               utils::iequals(name, "Comment")
+            || utils::iequals(name, "Domain")
+            || utils::iequals(name, "Max-Age")
+            || utils::iequals(name, "Path")
+            || utils::iequals(name, "Secure")
+            || utils::iequals(name, "Version")
+            || utils::iequals(name, "Expires")
+            || utils::iequals(name, "HttpOnly")
         )
     ));
 }

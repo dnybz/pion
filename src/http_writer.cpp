@@ -1,13 +1,14 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <pion/http/writer.hpp>
 #include <pion/http/message.hpp>
 
@@ -45,15 +46,15 @@ void writer::prepare_write_buffers(http::message::write_buffers_t& write_buffers
             // add chunk length as a string at the back of the text cache
             m_text_cache.push_back(cast_buf);
             // append length of chunk to write_buffers
-            write_buffers.push_back(boost::asio::buffer(m_text_cache.back()));
+            write_buffers.push_back(asio::buffer(m_text_cache.back()));
             // append an extra CRLF for chunk formatting
-            write_buffers.push_back(boost::asio::buffer(http::types::STRING_CRLF));
+            write_buffers.push_back(asio::buffer(http::types::STRING_CRLF));
             
             // append response content buffers
             write_buffers.insert(write_buffers.end(), m_content_buffers.begin(),
                                  m_content_buffers.end());
             // append an extra CRLF for chunk formatting
-            write_buffers.push_back(boost::asio::buffer(http::types::STRING_CRLF));
+            write_buffers.push_back(asio::buffer(http::types::STRING_CRLF));
         } else {
             // append response content buffers
             write_buffers.insert(write_buffers.end(), m_content_buffers.begin(),
@@ -66,10 +67,10 @@ void writer::prepare_write_buffers(http::message::write_buffers_t& write_buffers
         // add chunk length as a string at the back of the text cache
         m_text_cache.push_back("0");
         // append length of chunk to write_buffers
-        write_buffers.push_back(boost::asio::buffer(m_text_cache.back()));
+        write_buffers.push_back(asio::buffer(m_text_cache.back()));
         // append an extra CRLF for chunk formatting
-        write_buffers.push_back(boost::asio::buffer(http::types::STRING_CRLF));
-        write_buffers.push_back(boost::asio::buffer(http::types::STRING_CRLF));
+        write_buffers.push_back(asio::buffer(http::types::STRING_CRLF));
+        write_buffers.push_back(asio::buffer(http::types::STRING_CRLF));
     }
 }
 

@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -10,8 +11,6 @@
 #ifndef __PION_HTTP_RESPONSE_HEADER__
 #define __PION_HTTP_RESPONSE_HEADER__
 
-#include <boost/shared_ptr.hpp>
-#include <boost/lexical_cast.hpp>
 #include <pion/config.hpp>
 #include <pion/http/message.hpp>
 #include <pion/http/request.hpp>
@@ -206,7 +205,7 @@ protected:
         m_first_line = get_version_string();
         m_first_line += ' ';
         // append the response status code
-        m_first_line +=  boost::lexical_cast<std::string>(m_status_code);
+        m_first_line +=  std::to_string(m_status_code);
         m_first_line += ' ';
         // append the response status message
         m_first_line += m_status_message;
@@ -234,7 +233,7 @@ private:
 
 
 /// data type for a HTTP response pointer
-typedef boost::shared_ptr<response>     response_ptr;
+typedef std::shared_ptr<response>     response_ptr;
 
 
 }   // end namespace http

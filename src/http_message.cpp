@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -9,10 +10,9 @@
 
 #include <iostream>
 #include <algorithm>
-#include <boost/asio.hpp>
-#include <boost/assert.hpp>
-#include <boost/regex.hpp>
-#include <boost/logic/tribool.hpp>
+#include <asio.hpp>
+#include <regex>
+#include <pion/tribool.hpp>
 #include <pion/http/message.hpp>
 #include <pion/http/request.hpp>
 #include <pion/http/parser.hpp>
@@ -25,13 +25,13 @@ namespace http {    // begin namespace http
 
 // static members of message
 
-const boost::regex  message::REGEX_ICASE_CHUNKED(".*chunked.*", boost::regex::icase);
+const std::regex  message::REGEX_ICASE_CHUNKED(".*chunked.*", std::regex::icase);
 
 
 // message member functions
 
 std::size_t message::send(tcp::connection& tcp_conn,
-                          boost::system::error_code& ec, bool headers_only)
+                          asio::error_code& ec, bool headers_only)
 {
     // initialize write buffers for send operation using HTTP headers
     write_buffers_t write_buffers;
@@ -39,14 +39,14 @@ std::size_t message::send(tcp::connection& tcp_conn,
 
     // append payload content to write buffers (if there is any)
     if (!headers_only && get_content_length() > 0 && get_content() != NULL)
-        write_buffers.push_back(boost::asio::buffer(get_content(), get_content_length()));
+        write_buffers.push_back(asio::buffer(get_content(), get_content_length()));
 
     // send the message and return the result
     return tcp_conn.write(write_buffers, ec);
 }
 
 std::size_t message::receive(tcp::connection& tcp_conn,
-                             boost::system::error_code& ec,
+                             asio::error_code& ec,
                              parser& http_parser)
 {
     std::size_t last_bytes_read = 0;
@@ -65,17 +65,17 @@ std::size_t message::receive(tcp::connection& tcp_conn,
         // read buffer is empty (not pipelined) -> read some bytes from the connection
         last_bytes_read = tcp_conn.read_some(ec);
         if (ec) return 0;
-        BOOST_ASSERT(last_bytes_read > 0);
+        assert(last_bytes_read > 0);
         http_parser.set_read_buffer(tcp_conn.get_read_buffer().data(), last_bytes_read);
     }
 
     // incrementally read and parse bytes from the connection
     bool force_connection_closed = false;
-    boost::tribool parse_result;
+    pion::tribool parse_result;
     while (true) {
         // parse bytes available in the read buffer
         parse_result = http_parser.parse(*this, ec);
-        if (! boost::indeterminate(parse_result)) break;
+        if (! pion::indeterminate(parse_result)) break;
 
         // read more bytes from the connection
         last_bytes_read = tcp_conn.read_some(ec);
@@ -83,7 +83,7 @@ std::size_t message::receive(tcp::connection& tcp_conn,
             if (http_parser.check_premature_eof(*this)) {
                 // premature EOF encountered
                 if (! ec)
-                    ec = make_error_code(boost::system::errc::io_error);
+                    ec = make_error_code(std::errc::io_error);
                 return http_parser.get_total_bytes_read();
             } else {
                 // EOF reached when content length unknown
@@ -141,7 +141,7 @@ std::size_t message::receive(tcp::connection& tcp_conn,
 }
 
 std::size_t message::receive(tcp::connection& tcp_conn,
-                             boost::system::error_code& ec,
+                             asio::error_code& ec,
                              bool headers_only,
                              std::size_t max_content_length)
 {
@@ -152,7 +152,7 @@ std::size_t message::receive(tcp::connection& tcp_conn,
 }
 
 std::size_t message::write(std::ostream& out,
-    boost::system::error_code& ec, bool headers_only)
+    asio::error_code& ec, bool headers_only)
 {
     // reset error_code
     ec.clear();
@@ -163,16 +163,16 @@ std::size_t message::write(std::ostream& out,
 
     // append payload content to write buffers (if there is any)
     if (!headers_only && get_content_length() > 0 && get_content() != NULL)
-        write_buffers.push_back(boost::asio::buffer(get_content(), get_content_length()));
+        write_buffers.push_back(asio::buffer(get_content(), get_content_length()));
 
     // write message to the output stream
     std::size_t bytes_out = 0;
     for (write_buffers_t::const_iterator i=write_buffers.begin(); i!=write_buffers.end(); ++i) {
-        const char *ptr = boost::asio::buffer_cast<const char*>(*i);
-        size_t len = boost::asio::buffer_size(*i);
+        const char *ptr = asio::buffer_cast<const char*>(*i);
+        size_t len = asio::buffer_size(*i);
         out.write(ptr, len);
         if (!out) {
-          ec = make_error_code(boost::system::errc::io_error);
+          ec = make_error_code(std::errc::io_error);
           break;
         }
         bytes_out += len;
@@ -182,7 +182,7 @@ std::size_t message::write(std::ostream& out,
 }
 
 std::size_t message::read(std::istream& in,
-                          boost::system::error_code& ec,
+                          asio::error_code& ec,
                           parser& http_parser)
 {
     // make sure that we start out with an empty message & clear error_code
@@ -190,24 +190,24 @@ std::size_t message::read(std::istream& in,
     ec.clear();
     
     // parse data from file one byte at a time
-    boost::tribool parse_result;
+    pion::tribool parse_result;
     char c;
     while (in) {
         in.read(&c, 1);
         if ( ! in ) {
-            ec = make_error_code(boost::system::errc::io_error);
+            ec = make_error_code(std::errc::io_error);
             break;
         }
         http_parser.set_read_buffer(&c, 1);
         parse_result = http_parser.parse(*this, ec);
-        if (! boost::indeterminate(parse_result)) break;
+        if (! pion::indeterminate(parse_result)) break;
     }
 
-    if (boost::indeterminate(parse_result)) {
+    if (pion::indeterminate(parse_result)) {
         if (http_parser.check_premature_eof(*this)) {
             // premature EOF encountered
             if (! ec)
-                ec = make_error_code(boost::system::errc::io_error);
+                ec = make_error_code(std::errc::io_error);
         } else {
             // EOF reached when content length unknown
             // assume it is the correct end of content
@@ -221,7 +221,7 @@ std::size_t message::read(std::istream& in,
 }
 
 std::size_t message::read(std::istream& in,
-                          boost::system::error_code& ec,
+                          asio::error_code& ec,
                           bool headers_only,
                           std::size_t max_content_length)
 {

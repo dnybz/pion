@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -12,6 +13,7 @@
 
 #include <map>
 #include <string>
+#include <chrono>
 #include <pion/config.hpp>
 #include <pion/http/auth.hpp>
 
@@ -92,13 +94,13 @@ private:
     std::string                 m_realm; 
 
     /// time of the last cache clean up
-    boost::posix_time::ptime    m_cache_cleanup_time;
+	std::chrono::time_point<std::chrono::system_clock> m_cache_cleanup_time;
         
     /// cache of users that are currently active
     user_cache_type             m_user_cache;
     
     /// mutex used to protect access to the user cache
-    mutable boost::mutex        m_cache_mutex;
+    mutable std::mutex        m_cache_mutex;
 };
 
     

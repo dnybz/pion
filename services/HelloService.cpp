@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -23,7 +24,7 @@ void HelloService::operator()(const http::request_ptr& http_request_ptr, const t
 {
     static const std::string HELLO_HTML = "<html><body>Hello World!</body></html>";
     http::response_writer_ptr writer(http::response_writer::create(tcp_conn, *http_request_ptr,
-                                                            boost::bind(&tcp::connection::finish, tcp_conn)));
+                                                            std::bind(&tcp::connection::finish, tcp_conn)));
     writer->write_no_copy(HELLO_HTML);
     writer->write_no_copy(http::types::STRING_CRLF);
     writer->write_no_copy(http::types::STRING_CRLF);

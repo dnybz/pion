@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -12,9 +13,8 @@
 
 #include <string>
 #include <locale>
-#include <boost/algorithm/string.hpp>
-#include <boost/functional/hash.hpp>
 #include <pion/config.hpp>
+#include <pion/string_utils.hpp>
 
 #if defined(PION_HAVE_UNORDERED_MAP)
     #include <unordered_map>
@@ -79,10 +79,24 @@ namespace pion {    // begin namespace pion
         bool operator()(std::string const& x,
                         std::string const& y) const
         {
-            return boost::algorithm::iequals(x, y, std::locale());
+            return utils::iequals(x, y);
         }
     };
     
+	/**
+	* Called repeatedly to incrementally create a hash value from several variables.
+	*
+	* @see http://www.boost.org/doc/libs/1_58_0/doc/html/hash/combine.html
+	* @param seed seed value for this hash
+	* @param v value to compute hash over
+	*/
+	// http://stackoverflow.com/a/2595226
+	template <class T>
+	static void hash_combine(std::size_t& seed, const T& v) {
+		std::hash<T> hasher;
+		seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+
     /// case insensitive hash generic function
     /// copied from boost.unordered hash_equality documentation
     /// http://www.boost.org/doc/libs/1_50_0/doc/html/unordered/hash_equality.html
@@ -97,7 +111,7 @@ namespace pion {    // begin namespace pion
             for(std::string::const_iterator it = x.begin();
                 it != x.end(); ++it)
             {
-                boost::hash_combine(seed, std::toupper(*it, locale));
+				pion::hash_combine(seed, std::toupper(*it, locale));
             }
             
             return seed;

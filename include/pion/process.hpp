@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -11,10 +12,8 @@
 #define __PION_PROCESS_HEADER__
 
 #include <string>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
+#include <mutex>
+#include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 
 // Dump file generation support on Windows
@@ -35,7 +34,7 @@ namespace pion {    // begin namespace pion
 /// process: class for managing process/service related functions
 ///
 class PION_API process :
-    private boost::noncopyable
+    private pion::noncopyable
 {
 public:
 
@@ -99,10 +98,10 @@ protected:
         bool                    shutdown_now;
         
         /// triggered when it is time to shutdown
-        boost::condition        shutdown_cond;
+        std::condition_variable        shutdown_cond;
 
         /// used to protect the shutdown condition
-        boost::mutex            shutdown_mutex;
+        std::mutex            shutdown_mutex;
 
 // Dump file generation support on Windows
 #ifdef PION_WIN32
@@ -119,7 +118,7 @@ protected:
 
     /// returns a singleton instance of config_type
     static inline config_type& get_config(void) {
-        boost::call_once(process::create_config, m_instance_flag);
+        std::call_once(m_instance_flag, process::create_config);
         return *m_config_ptr;
     }
 
@@ -131,7 +130,7 @@ private:
 
     
     /// used to ensure thread safety of the config_type singleton
-    static boost::once_flag             m_instance_flag;
+    static std::once_flag             m_instance_flag;
 
     /// pointer to the config_type singleton
     static config_type *          m_config_ptr;

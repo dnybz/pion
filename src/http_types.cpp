@@ -1,18 +1,18 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <boost/lexical_cast.hpp>
-#include <boost/thread/mutex.hpp>
 #include <pion/http/types.hpp>
 #include <pion/algorithm.hpp>
 #include <cstdio>
 #include <ctime>
+#include <mutex>
 
 
 namespace pion {    // begin namespace pion
@@ -44,14 +44,33 @@ const std::string   types::HEADER_AUTHORIZATION("Authorization");
 const std::string   types::HEADER_REFERER("Referer");
 const std::string   types::HEADER_USER_AGENT("User-Agent");
 const std::string   types::HEADER_X_FORWARDED_FOR("X-Forwarded-For");
+const std::string   types::HEADER_X_POWERED_BY("X-Powered-By");
+const std::string   types::HEADER_X_REQUESTED_WITH("X-Requested-With");
+const std::string   types::HEADER_X_UA_COMPATIBLE("X-UA-Compatible");
 const std::string   types::HEADER_CLIENT_IP("Client-IP");
+const std::string   types::HEADER_CACHE_CONTROL("Cache-Control");
+const std::string   types::HEADER_ORIGIN("Origin");
+const std::string   types::HEADER_ACCEPT("Accept");
+const std::string   types::HEADER_ALLOW("Allow");
+const std::string   types::HEADER_CORS_ALLOW_ORIGIN("Access-Control-Allow-Origin");
+const std::string   types::HEADER_CORS_ALLOW_CREDENTIALS("Access-Control-Allow-Credentials");
+const std::string   types::HEADER_CORS_ALLOW_METHODS("Access-Control-Allow-Methods");
+const std::string   types::HEADER_CORS_ALLOW_HEADERS("Access-Control-Allow-Headers");
+const std::string   types::HEADER_CORS_REQUEST_METHOD("Access-Control-Request-Method");
 
 // common HTTP content types
 const std::string   types::CONTENT_TYPE_HTML("text/html");
 const std::string   types::CONTENT_TYPE_TEXT("text/plain");
 const std::string   types::CONTENT_TYPE_XML("text/xml");
+const std::string   types::CONTENT_TYPE_APP_JSON("application/json");
+const std::string   types::CONTENT_TYPE_APP_XHTML_XML("application/xhtml+xml");
 const std::string   types::CONTENT_TYPE_URLENCODED("application/x-www-form-urlencoded");
 const std::string   types::CONTENT_TYPE_MULTIPART_FORM_DATA("multipart/form-data");
+const std::string   types::CONTENT_TYPE_HTML_UTF8("text/html" "; charset=utf-8");
+const std::string   types::CONTENT_TYPE_TEXT_UTF8("text/plain" "; charset=utf-8");
+const std::string   types::CONTENT_TYPE_XML_UTF8("text/xml" "; charset=utf-8");
+const std::string   types::CONTENT_TYPE_APP_JSON_UTF8("application/json" "; charset=utf-8");
+const std::string   types::CONTENT_TYPE_APP_XHTML_XML_UTF8("application/xhtml+xml" "; charset=utf-8");
 
 // common HTTP request methods
 const std::string   types::REQUEST_METHOD_HEAD("HEAD");
@@ -72,6 +91,11 @@ const std::string   types::RESPONSE_MESSAGE_NOT_FOUND("Not Found");
 const std::string   types::RESPONSE_MESSAGE_METHOD_NOT_ALLOWED("Method Not Allowed");
 const std::string   types::RESPONSE_MESSAGE_NOT_MODIFIED("Not Modified");
 const std::string   types::RESPONSE_MESSAGE_BAD_REQUEST("Bad Request");
+const std::string   types::RESPONSE_MESSAGE_CONFLICT("Conflict");
+const std::string   types::RESPONSE_MESSAGE_PRECONDITION_FAILED("Precondition Failed");
+const std::string   types::RESPONSE_MESSAGE_UNSUPPORTED_MEDIA_TYPE("Unsupported Media Type");
+const std::string   types::RESPONSE_MESSAGE_UNPROCESSABLE_ENTITY("Unprocessable Entity");
+const std::string   types::RESPONSE_MESSAGE_UPGRADE_REQUIRED("Upgrade Required");
 const std::string   types::RESPONSE_MESSAGE_SERVER_ERROR("Server Error");
 const std::string   types::RESPONSE_MESSAGE_NOT_IMPLEMENTED("Not Implemented");
 const std::string   types::RESPONSE_MESSAGE_CONTINUE("Continue");
@@ -88,6 +112,11 @@ const unsigned int  types::RESPONSE_CODE_NOT_FOUND = 404;
 const unsigned int  types::RESPONSE_CODE_METHOD_NOT_ALLOWED = 405;
 const unsigned int  types::RESPONSE_CODE_NOT_MODIFIED = 304;
 const unsigned int  types::RESPONSE_CODE_BAD_REQUEST = 400;
+const unsigned int  types::RESPONSE_CODE_CONFLICT = 409;
+const unsigned int  types::RESPONSE_CODE_PRECONDITION_FAILED = 412;
+const unsigned int  types::RESPONSE_CODE_UNSUPPORTED_MEDIA_TYPE = 415;
+const unsigned int  types::RESPONSE_CODE_UNPROCESSABLE_ENTITY = 422;
+const unsigned int  types::RESPONSE_CODE_UPGRADE_REQUIRED = 426;
 const unsigned int  types::RESPONSE_CODE_SERVER_ERROR = 500;
 const unsigned int  types::RESPONSE_CODE_NOT_IMPLEMENTED = 501;
 const unsigned int  types::RESPONSE_CODE_CONTINUE = 100;
@@ -98,12 +127,12 @@ const unsigned int  types::RESPONSE_CODE_CONTINUE = 100;
 std::string types::get_date_string(const time_t t)
 {
     // use mutex since time functions are normally not thread-safe
-    static boost::mutex time_mutex;
+    static std::mutex time_mutex;
     static const char *TIME_FORMAT = "%a, %d %b %Y %H:%M:%S GMT";
     static const unsigned int TIME_BUF_SIZE = 100;
     char time_buf[TIME_BUF_SIZE+1];
 
-    boost::mutex::scoped_lock time_lock(time_mutex);
+    std::unique_lock<std::mutex> time_lock(time_mutex);
     if (strftime(time_buf, TIME_BUF_SIZE, TIME_FORMAT, gmtime(&t)) == 0)
         time_buf[0] = '\0'; // failed; resulting buffer is indeterminate
     time_lock.unlock();
@@ -141,7 +170,7 @@ std::string types::make_set_cookie_header(const std::string& name,
     }
     if (has_max_age) {
         set_cookie_header += "; Max-Age=";
-        set_cookie_header += boost::lexical_cast<std::string>(max_age);
+        set_cookie_header += std::to_string(max_age);
     }
     return set_cookie_header;
 }

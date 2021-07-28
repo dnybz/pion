@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -12,17 +13,9 @@
 
 #include <map>
 #include <string>
-// #pragma diagnostic is only supported by GCC >= 4.2.1
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 2) || (__GNUC__ == 4 && __GNUC_MINOR__ == 2 && __GNUC_PATCHLEVEL__ >= 1)
-    #pragma GCC diagnostic ignored "-Wunused-parameter"
-    #include <boost/random.hpp>
-    #pragma GCC diagnostic warning "-Wunused-parameter"
-#else
-    #include <boost/random.hpp>
-#endif
+#include <random>
 #include <pion/config.hpp>
 #include <pion/http/auth.hpp>
-
 
 namespace pion {    // begin namespace pion
 namespace http {    // begin namespace http
@@ -132,7 +125,7 @@ protected:
     /**
      * Cache expiration cleanup. (Call it periodically)
      */
-    void expire_cache(const boost::posix_time::ptime &time_now);
+    void expire_cache(const std::chrono::time_point<std::chrono::system_clock> &time_now);
 
     
 private:
@@ -155,23 +148,21 @@ private:
     /// value of "redirection" resource 
     std::string                 m_redirect;
     
-    /// random number generator used for cookie generation
-    boost::mt19937              m_random_gen;
+    // random number generator used for cookie generation
+	std::mt19937              m_random_gen;
 
-    /// random number range used for cookie generation
-    boost::uniform_int<>        m_random_range;
 
-    /// random dice that uses m_random_gen to produce ints within m_random_range
-    boost::variate_generator<boost::mt19937&, boost::uniform_int<> >    m_random_die;
+	std::uniform_int_distribution<> m_distrib;
+
 
     /// time of the last cache clean up
-    boost::posix_time::ptime    m_cache_cleanup_time;
+	std::chrono::time_point<std::chrono::system_clock>    m_cache_cleanup_time;
         
     /// cache of users that are currently active
     user_cache_type             m_user_cache;
     
     /// mutex used to protect access to the user cache
-    mutable boost::mutex        m_cache_mutex;
+    mutable std::mutex        m_cache_mutex;
 };
 
     

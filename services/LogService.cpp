@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -58,7 +59,7 @@ LogServiceAppender::~LogServiceAppender()
 void LogServiceAppender::append(const log4cxx::spi::LoggingEventPtr& event)
 {
     // custom layouts is not supported for log4cxx library
-    std::string formatted_string(boost::lexical_cast<std::string>(event->getTimeStamp()));
+    std::string formatted_string(std::to_string(event->getTimeStamp()));
     formatted_string += ' ';
     formatted_string += event->getLevel()->toString();
     formatted_string += ' ';
@@ -72,7 +73,7 @@ void LogServiceAppender::append(const log4cxx::spi::LoggingEventPtr& event)
 void LogServiceAppender::append(const log4cplus::spi::InternalLoggingEvent& event)
 {
     // custom layouts is not supported for log4cplus library
-    std::string formatted_string(boost::lexical_cast<std::string>(event.getTimestamp().sec()));
+    std::string formatted_string(std::to_string(event.getTimestamp().sec()));
     formatted_string += ' ';
     formatted_string += m_log_level_manager.toString(event.getLogLevel());
     formatted_string += ' ';
@@ -92,7 +93,7 @@ void LogServiceAppender::_append(const log4cpp::LoggingEvent& event)
 
 void LogServiceAppender::addLogString(const std::string& log_string)
 {
-    boost::mutex::scoped_lock log_lock(m_log_mutex);
+    std::unique_lock<std::mutex> log_lock(m_log_mutex);
     m_log_events.push_back(log_string);
     ++m_num_events;
     while (m_num_events > m_max_events) {
@@ -104,7 +105,7 @@ void LogServiceAppender::addLogString(const std::string& log_string)
 void LogServiceAppender::writeLogEvents(const pion::http::response_writer_ptr& writer)
 {
 #if defined(PION_USE_LOG4CXX) || defined(PION_USE_LOG4CPLUS) || defined(PION_USE_LOG4CPP)
-    boost::mutex::scoped_lock log_lock(m_log_mutex);
+    std::unique_lock<std::mutex> log_lock(m_log_mutex);
     for (std::list<std::string>::const_iterator i = m_log_events.begin();
          i != m_log_events.end(); ++i)
     {
@@ -155,7 +156,7 @@ void LogService::operator()(const http::request_ptr& http_request_ptr, const tcp
 {
     // Set Content-type to "text/plain" (plain ascii text)
     http::response_writer_ptr writer(http::response_writer::create(tcp_conn, *http_request_ptr,
-                                                                   boost::bind(&tcp::connection::finish, tcp_conn)));
+                                                                   std::bind(&tcp::connection::finish, tcp_conn)));
     writer->get_response().set_content_type(http::types::CONTENT_TYPE_TEXT);
     getLogAppender().writeLogEvents(writer);
     writer->send();

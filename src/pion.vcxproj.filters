@@ -72,6 +72,12 @@
     <ClCompile Include="spdy_parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="string_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\pion\admin_rights.hpp">
@@ -176,7 +182,13 @@
     <ClInclude Include="..\include\pion\tcp\stream.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\pion\test\unit_test.hpp">
+    <ClInclude Include="..\include\pion\config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pion\string_utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pion\noncopyable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

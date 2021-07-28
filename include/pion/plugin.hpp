@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -14,13 +15,9 @@
 #include <string>
 #include <map>
 #include <list>
-#include <boost/noncopyable.hpp>
-#include <boost/thread/once.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/filesystem/path.hpp>
 #include <pion/config.hpp>
 #include <pion/error.hpp>
-
+#include <pion/noncopyable.hpp>
 
 namespace pion {    // begin namespace pion
 
@@ -76,7 +73,7 @@ public:
      *                   this will be appended to PION_CYGWIN_DIRECTORY to attempt
      *                   attempt correction of final_path for cygwin
      */
-    static void check_cygwin_path(boost::filesystem::path& final_path,
+    static void check_cygwin_path(fs::path& final_path,
                                 const std::string& path_string);
 
     /// appends a directory to the plug-in search path
@@ -210,13 +207,13 @@ private:
         map_type                    m_plugin_map;
         
         /// mutex to make class thread-safe
-        boost::mutex                m_plugin_mutex;
+        std::mutex                m_plugin_mutex;
     };
 
     
     /// returns a singleton instance of config_type
     static inline config_type& get_plugin_config(void) {
-        boost::call_once(plugin::create_plugin_config, m_instance_flag);
+        std::call_once(m_instance_flag, plugin::create_plugin_config);
         return *m_config_ptr;
     }
     
@@ -283,7 +280,7 @@ private:
     static const std::string            PION_CONFIG_EXTENSION;
     
     /// used to ensure thread safety of the plugin_config singleton
-    static boost::once_flag             m_instance_flag;
+    static std::once_flag             m_instance_flag;
 
     /// pointer to the plugin_config singleton
     static config_type *           m_config_ptr;
@@ -327,7 +324,7 @@ public:
         CreateObjectFunction *create_func =
             (CreateObjectFunction*)(get_create_function());
         if (create_func == NULL)
-            BOOST_THROW_EXCEPTION( error::plugin_undefined() );
+			std::cout << "plugin_undefined" << std::endl;
         return create_func();
     }
     
@@ -342,7 +339,7 @@ public:
         Cast.v_ = get_destroy_function();
         DestroyObjectFunction *destroy_func = Cast.f_;
         if (destroy_func == NULL)
-            BOOST_THROW_EXCEPTION( error::plugin_undefined() );
+			std::cout << "plugin_undefined" << std::endl;
         destroy_func(object_ptr);
     }
 };
@@ -353,7 +350,7 @@ public:
 ///
 template <typename InterfaceClassType>
 class plugin_instance_ptr :
-    private boost::noncopyable
+    private pion::noncopyable
 {
 public:
 

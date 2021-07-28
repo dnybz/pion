@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -9,7 +10,7 @@
 
 #include <vector>
 #include <iostream>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <pion/error.hpp>
 #include <pion/plugin.hpp>
 #include <pion/process.hpp>
@@ -17,11 +18,11 @@
 
 // these are used only when linking to static web service libraries
 // #ifdef PION_STATIC_LINKING
-PION_DECLARE_PLUGIN(EchoService)
-PION_DECLARE_PLUGIN(FileService)
-PION_DECLARE_PLUGIN(HelloService)
-PION_DECLARE_PLUGIN(LogService)
-PION_DECLARE_PLUGIN(CookieService)
+//PION_DECLARE_PLUGIN(EchoService)
+//PION_DECLARE_PLUGIN(FileService) 
+//PION_DECLARE_PLUGIN(HelloService)
+//PION_DECLARE_PLUGIN(LogService)
+//PION_DECLARE_PLUGIN(CookieService)
 
 using namespace std;
 using namespace pion;
@@ -40,13 +41,14 @@ void argument_error(void)
 int main (int argc, char *argv[])
 {
     static const unsigned int DEFAULT_PORT = 8080;
+	static const unsigned int DEFAULT_SSL_PORT = 443;
 
     // used to keep track of web service name=value options
     typedef std::vector<std::pair<std::string, std::string> >   ServiceOptionsType;
     ServiceOptionsType service_options;
     
     // parse command line: determine port number, RESOURCE and WEBSERVICE
-    boost::asio::ip::tcp::endpoint cfg_endpoint(boost::asio::ip::tcp::v4(), DEFAULT_PORT);
+    asio::ip::tcp::endpoint cfg_endpoint(asio::ip::tcp::v4(), DEFAULT_PORT);
     std::string service_config_file;
     std::string resource_name;
     std::string service_name;
@@ -63,13 +65,13 @@ int main (int argc, char *argv[])
                 if (cfg_endpoint.port() == 0) cfg_endpoint.port(DEFAULT_PORT);
             } else if (argv[argnum][1] == 'i' && argv[argnum][2] == '\0' && argnum+1 < argc) {
                 // set ip address
-                cfg_endpoint.address(boost::asio::ip::address::from_string(argv[++argnum]));
+                cfg_endpoint.address(asio::ip::address::from_string(argv[++argnum]));
             } else if (argv[argnum][1] == 'c' && argv[argnum][2] == '\0' && argnum+1 < argc) {
                 service_config_file = argv[++argnum];
             } else if (argv[argnum][1] == 'd' && argv[argnum][2] == '\0' && argnum+1 < argc) {
                 // add the service plug-ins directory to the search path
                 try { plugin::add_plugin_directory(argv[++argnum]); }
-                catch (error::directory_not_found&) {
+                catch (...) {
                     std::cerr << "piond: Web service plug-ins directory does not exist: "
                         << argv[argnum] << std::endl;
                     return 1;
@@ -88,6 +90,7 @@ int main (int argc, char *argv[])
                        argv[argnum][3] == 'l' && argv[argnum][4] == '\0' && argnum+1 < argc) {
                 ssl_flag = true;
                 ssl_pem_file = argv[++argnum];
+				cfg_endpoint.port(DEFAULT_SSL_PORT);
             } else if (argv[argnum][1] == 'v' && argv[argnum][2] == '\0') {
                 verbose_flag = true;
             } else {
@@ -129,16 +132,16 @@ int main (int argc, char *argv[])
     try {
         // add the Pion plug-ins installation directory to our path
         try { plugin::add_plugin_directory(PION_PLUGINS_DIRECTORY); }
-        catch (error::directory_not_found&) {
+        catch (...) {
             PION_LOG_WARN(main_log, "Default plug-ins directory does not exist: "
                 << PION_PLUGINS_DIRECTORY);
         }
 
         // add the directory of the program we're running to our path
-        try { plugin::add_plugin_directory(boost::filesystem::path(argv[0]).branch_path().string()); }
-        catch (error::directory_not_found&) {
+        try { plugin::add_plugin_directory(fs::path(argv[0]).parent_path().string()); }
+        catch (...) {
             PION_LOG_WARN(main_log, "Directory of current executable does not exist: "
-                << boost::filesystem::path(argv[0]).branch_path());
+                << fs::path(argv[0]).parent_path());
         }
 
         // create a server for HTTP & add the Hello Service
@@ -174,7 +177,7 @@ int main (int argc, char *argv[])
         process::wait_for_shutdown();
         
     } catch (std::exception& e) {
-        PION_LOG_FATAL(main_log, pion::diagnostic_information(e));
+        PION_LOG_FATAL(main_log, e.what());
     }
 
     return 0;

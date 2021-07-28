@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -10,7 +11,7 @@
 #ifndef __PION_HTTP_REQUEST_HEADER__
 #define __PION_HTTP_REQUEST_HEADER__
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <pion/config.hpp>
 #include <pion/http/message.hpp>
 #include <pion/user.hpp>
@@ -214,7 +215,7 @@ private:
 
 
 /// data type for a HTTP request pointer
-typedef boost::shared_ptr<request>      request_ptr;
+typedef std::shared_ptr<request>      request_ptr;
 
 
 }   // end namespace http

@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -10,9 +11,7 @@
 #ifndef __PION_SPDYDECOMPRESSOR_HEADER__
 #define __PION_SPDYDECOMPRESSOR_HEADER__
 
-
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 #include <pion/spdy/types.hpp>
 #include <zlib.h>
@@ -48,9 +47,9 @@ public:
      * @return the uncompressed string, or null on failure
      */
     char* decompress(const char *compressed_data_ptr,
-                     boost::uint32_t stream_id,
+                     uint32_t stream_id,
                      const spdy_control_frame_info& frame,
-                     boost::uint32_t header_block_length);
+                     uint32_t header_block_length);
 
     
 protected:
@@ -62,8 +61,8 @@ protected:
      */
     bool spdy_decompress_header(const char *compressed_data_ptr,
                                 z_streamp decomp,
-                                boost::uint32_t length,
-                                boost::uint32_t& uncomp_length);
+                                uint32_t length,
+                                uint32_t& uncomp_length);
 
 
 private:
@@ -75,17 +74,17 @@ private:
     z_streamp                           m_response_zstream;
     
     /// dictionary identifier
-    boost::uint32_t                     m_dictionary_id;
+    uint32_t                     m_dictionary_id;
     
     /// Used for decompressing spdy headers
-    boost::uint8_t                      m_uncompressed_header[MAX_UNCOMPRESSED_DATA_BUF_SIZE];
+    uint8_t                      m_uncompressed_header[MAX_UNCOMPRESSED_DATA_BUF_SIZE];
 
     // SPDY Dictionary used for zlib decompression
     static const char                   SPDY_ZLIB_DICTIONARY[];
 };
     
 /// data type for a spdy reader pointer
-typedef boost::shared_ptr<decompressor>       decompressor_ptr;
+typedef std::shared_ptr<decompressor>       decompressor_ptr;
     
 }   // end namespace spdy
 }   // end namespace pion

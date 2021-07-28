@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -9,19 +10,11 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <boost/regex.hpp>
-#include <boost/assert.hpp>
-#include <boost/logic/tribool.hpp>
-#include <boost/algorithm/string.hpp>
 
-#include <boost/archive/iterators/base64_from_binary.hpp>
-#include <boost/archive/iterators/binary_from_base64.hpp>
-#include <boost/archive/iterators/insert_linebreaks.hpp>
-#include <boost/archive/iterators/transform_width.hpp>
-#include <boost/archive/iterators/ostream_iterator.hpp>
 #include <sstream>
 #include <string>
-
+#include <pion/string_utils.hpp>
+#include <pion/tribool.hpp>
 #include <pion/algorithm.hpp>
 #include <pion/http/parser.hpp>
 #include <pion/http/request.hpp>
@@ -35,29 +28,29 @@ namespace http {    // begin namespace http
 
 // static members of parser
 
-const boost::uint32_t   parser::STATUS_MESSAGE_MAX = 1024;  // 1 KB
-const boost::uint32_t   parser::METHOD_MAX = 1024;  // 1 KB
-const boost::uint32_t   parser::RESOURCE_MAX = 256 * 1024;  // 256 KB
-const boost::uint32_t   parser::QUERY_STRING_MAX = 1024 * 1024; // 1 MB
-const boost::uint32_t   parser::HEADER_NAME_MAX = 1024; // 1 KB
-const boost::uint32_t   parser::HEADER_VALUE_MAX = 1024 * 1024; // 1 MB
-const boost::uint32_t   parser::QUERY_NAME_MAX = 1024;  // 1 KB
-const boost::uint32_t   parser::QUERY_VALUE_MAX = 1024 * 1024;  // 1 MB
-const boost::uint32_t   parser::COOKIE_NAME_MAX = 1024; // 1 KB
-const boost::uint32_t   parser::COOKIE_VALUE_MAX = 1024 * 1024; // 1 MB
+const uint32_t   parser::STATUS_MESSAGE_MAX = 1024;  // 1 KB
+const uint32_t   parser::METHOD_MAX = 1024;  // 1 KB
+const uint32_t   parser::RESOURCE_MAX = 256 * 1024;  // 256 KB
+const uint32_t   parser::QUERY_STRING_MAX = 1024 * 1024; // 1 MB
+const uint32_t   parser::HEADER_NAME_MAX = 1024; // 1 KB
+const uint32_t   parser::HEADER_VALUE_MAX = 1024 * 1024; // 1 MB
+const uint32_t   parser::QUERY_NAME_MAX = 1024;  // 1 KB
+const uint32_t   parser::QUERY_VALUE_MAX = 1024 * 1024;  // 1 MB
+const uint32_t   parser::COOKIE_NAME_MAX = 1024; // 1 KB
+const uint32_t   parser::COOKIE_VALUE_MAX = 1024 * 1024; // 1 MB
 const std::size_t       parser::DEFAULT_CONTENT_MAX = 1024 * 1024;  // 1 MB
 parser::error_category_t * parser::m_error_category_ptr = NULL;
-boost::once_flag            parser::m_instance_flag = BOOST_ONCE_INIT;
+std::once_flag parser::m_instance_flag;
 
 
 // parser member functions
 
-boost::tribool parser::parse(http::message& http_msg,
-    boost::system::error_code& ec)
+pion::tribool parser::parse(http::message& http_msg,
+    asio::error_code& ec)
 {
-    BOOST_ASSERT(! eof() );
+    assert(! eof() );
 
-    boost::tribool rc = boost::indeterminate;
+    pion::tribool rc = pion::indeterminate;
     std::size_t total_bytes_parsed = 0;
 
     if(http_msg.has_missing_packets()) {
@@ -94,7 +87,7 @@ boost::tribool parser::parse(http::message& http_msg,
                     
                     // Handle footers if present
                     rc = ((m_message_parse_state == PARSE_FOOTERS) ?
-                          boost::indeterminate : (boost::tribool)true);
+                          pion::indeterminate : (pion::tribool)true);
                 }
                 break;
 
@@ -115,7 +108,7 @@ boost::tribool parser::parse(http::message& http_msg,
                 rc = true;
                 break;
         }
-    } while ( boost::indeterminate(rc) && ! eof() );
+    } while ( pion::indeterminate(rc) && ! eof() );
 
     // check if we've finished parsing the HTTP message
     if (rc == true) {
@@ -131,11 +124,11 @@ boost::tribool parser::parse(http::message& http_msg,
     return rc;
 }
 
-boost::tribool parser::parse_missing_data(http::message& http_msg,
-    std::size_t len, boost::system::error_code& ec)
+pion::tribool parser::parse_missing_data(http::message& http_msg,
+    std::size_t len, asio::error_code& ec)
 {
     static const char MISSING_DATA_CHAR = 'X';
-    boost::tribool rc = boost::indeterminate;
+    pion::tribool rc = pion::indeterminate;
 
     http_msg.set_missing_packets(true);
 
@@ -245,11 +238,11 @@ boost::tribool parser::parse_missing_data(http::message& http_msg,
     return rc;
 }
 
-boost::tribool parser::parse_headers(http::message& http_msg,
-    boost::system::error_code& ec)
+pion::tribool parser::parse_headers(http::message& http_msg,
+    asio::error_code& ec)
 {
     //
-    // note that boost::tribool may have one of THREE states:
+    // note that pion::tribool may have one of THREE states:
     //
     // false: encountered an error while parsing HTTP headers
     // true: finished successfully parsing the HTTP headers
@@ -692,7 +685,7 @@ boost::tribool parser::parse_headers(http::message& http_msg,
 
     m_bytes_last_read = (m_read_ptr - read_start_ptr);
     m_bytes_total_read += m_bytes_last_read;
-    return boost::indeterminate;
+    return pion::indeterminate;
 }
 
 void parser::update_message_with_header_data(http::message& http_msg) const
@@ -749,10 +742,10 @@ void parser::update_message_with_header_data(http::message& http_msg) const
     }
 }
 
-boost::tribool parser::finish_header_parsing(http::message& http_msg,
-    boost::system::error_code& ec)
+pion::tribool parser::finish_header_parsing(http::message& http_msg,
+    asio::error_code& ec)
 {
-    boost::tribool rc = boost::indeterminate;
+    pion::tribool rc = pion::indeterminate;
 
     m_bytes_content_remaining = m_bytes_content_read = 0;
     http_msg.set_content_length(0);
@@ -837,7 +830,7 @@ boost::tribool parser::finish_header_parsing(http::message& http_msg,
 }
     
 bool parser::parse_uri(const std::string& uri, std::string& proto, 
-                      std::string& host, boost::uint16_t& port,
+                      std::string& host, uint16_t& port,
                       std::string& path, std::string& query)
 {
     size_t proto_end = uri.find("://");
@@ -874,8 +867,8 @@ bool parser::parse_uri(const std::string& uri, std::string& proto,
     // parse the port, if it's not empty
     if(port_pos != std::string::npos) {
         try {
-            port = boost::lexical_cast<int>(t.substr(port_pos+1));
-        } catch (boost::bad_lexical_cast &) {
+        port = std::stoi(t.substr(port_pos+1));
+        } catch (...) {
             return false;
         }
     } else if (proto == "http" || proto == "HTTP") {
@@ -992,20 +985,13 @@ bool parser::binary_2base64(std::string& out_val, const char *buf, const std::si
     if (buf == NULL)
         return false;
 
-    using namespace boost::archive::iterators;
-    typedef
-        base64_from_binary<    // convert binary values to base64 characters
-            transform_width<   // retrieve 6 bit integers from a sequence of 8 bit bytes
-                const char *, 6, 8
-            >
-        >
-        binary_2base64; // compose all the above operations in to a new iterator
-
+	std::string str;
+	algorithm::base64_encode(std::string(buf, buf_size), str);
     std::stringstream os;
     std::copy(
-        binary_2base64(buf),
-        binary_2base64(buf + buf_size),
-        ostream_iterator<char>(os)
+		str.data(),
+		str.data() + buf_size,
+        std::ostream_iterator<char>(os)
         );
     os << padding[buf_size % 3];
 
@@ -1018,20 +1004,11 @@ bool parser::binary_2base64(std::string& out_val, const char *buf, const std::si
 
 bool parser::base64_2binary(char *out_buf, const std::size_t buf_size, std::size_t& out_size, std::string& out_stream_type, const std::string& base64)
 {
-    using namespace boost::archive::iterators;
-    typedef
-        transform_width<                        // retrieve 8 bit integers from a sequence of 6 bit bytes
-            binary_from_base64<const char *>,    // convert binary values to base64 characters
-                8,
-                6
-        >
-        base64_2binary; // compose all the above operations in to a new iterator
-
     std::size_t size = base64.size();
     
     out_size = 0;
 
-    if (false == boost::algorithm::equals(base64.substr(0, 5), "data:"))
+    if (false == utils::equals(base64.substr(0, 5), "data:"))
         return false;
     std::size_t pos = base64.find("; base64, ");
     if (pos == std::string::npos)
@@ -1051,11 +1028,14 @@ bool parser::base64_2binary(char *out_buf, const std::size_t buf_size, std::size
     if (size > buf_size || out_buf == NULL)
         return false;
 
-    char *p = std::copy(
-        base64_2binary(base64.data() + prefix_end_pos),
-        base64_2binary(base64.data() + size),
-        out_buf
-        );
+	std::string str;
+	algorithm::base64_decode(std::string(base64.data(), size), str);
+	char *p = std::copy(
+		str.data() + prefix_end_pos,
+		str.data() + size,
+	    out_buf
+	    );
+
     *p = '\0';
     
     return true;
@@ -1165,11 +1145,11 @@ bool parser::parse_multipart_form_data(ihash_multimap& dict,
                 // parsing the value of a header
                 if (*ptr == '\r' || *ptr == '\n') {
                     // reached the end of the value -> check if it's important
-                    if (boost::algorithm::iequals(header_name, types::HEADER_CONTENT_TYPE)) {
+                    if (utils::iequals(header_name, types::HEADER_CONTENT_TYPE)) {
                         content_type_header.assign(header_value);
                         // do not encode fields that have a text type or no type
-                        do_mime64_convertion = false == boost::algorithm::iequals(header_value.substr(0, 5), "text/");
-                    } else if (boost::algorithm::iequals(header_name, types::HEADER_CONTENT_DISPOSITION)) {
+                        do_mime64_convertion = false == utils::iequals(header_value.substr(0, 5), "text/");
+                    } else if (utils::iequals(header_name, types::HEADER_CONTENT_DISPOSITION)) {
                         // get current field from content-disposition header
                         std::size_t name_pos = header_value.find("name=\"");
                         if (name_pos != std::string::npos) {
@@ -1350,11 +1330,11 @@ bool parser::parse_cookie_header(ihash_multimap& dict,
     return true;
 }
 
-boost::tribool parser::parse_chunks(http::message::chunk_cache_t& chunks,
-    boost::system::error_code& ec)
+pion::tribool parser::parse_chunks(http::message::chunk_cache_t& chunks,
+    asio::error_code& ec)
 {
     //
-    // note that boost::tribool may have one of THREE states:
+    // note that pion::tribool may have one of THREE states:
     //
     // false: encountered an error while parsing message
     // true: finished successfully parsing the message
@@ -1513,15 +1493,15 @@ boost::tribool parser::parse_chunks(http::message::chunk_cache_t& chunks,
     m_bytes_last_read = (m_read_ptr - read_start_ptr);
     m_bytes_total_read += m_bytes_last_read;
     m_bytes_content_read += m_bytes_last_read;
-    return boost::indeterminate;
+    return pion::indeterminate;
 }
 
-boost::tribool parser::consume_content(http::message& http_msg,
-    boost::system::error_code& /* ec */)
+pion::tribool parser::consume_content(http::message& http_msg,
+    asio::error_code& /* ec */)
 {
     size_t content_bytes_to_read;
     size_t content_bytes_available = bytes_available();
-    boost::tribool rc = boost::indeterminate;
+    pion::tribool rc = pion::indeterminate;
 
     if (m_bytes_content_remaining == 0) {
         // we have all of the remaining payload content
@@ -1669,29 +1649,29 @@ void parser::create_error_category(void)
 bool parser::parse_forwarded_for(const std::string& header, std::string& public_ip)
 {
     // static regex's used to check for ipv4 address
-    static const boost::regex IPV4_ADDR_RX("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}");
+    static const std::regex IPV4_ADDR_RX("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}");
 
     /// static regex used to check for private/local networks:
     /// 10.*
     /// 127.*
     /// 192.168.*
     /// 172.16-31.*
-    static const boost::regex PRIVATE_NET_RX("(10\\.[0-9]{1,3}|127\\.[0-9]{1,3}|192\\.168|172\\.1[6-9]|172\\.2[0-9]|172\\.3[0-1])\\.[0-9]{1,3}\\.[0-9]{1,3}");
+    static const std::regex PRIVATE_NET_RX("(10\\.[0-9]{1,3}|127\\.[0-9]{1,3}|192\\.168|172\\.1[6-9]|172\\.2[0-9]|172\\.3[0-1])\\.[0-9]{1,3}\\.[0-9]{1,3}");
 
     // sanity check
     if (header.empty())
         return false;
 
     // local variables re-used by while loop
-    boost::match_results<std::string::const_iterator> m;
+    std::match_results<std::string::const_iterator> m;
     std::string::const_iterator start_it = header.begin();
 
     // search for next ip address within the header
-    while (boost::regex_search(start_it, header.end(), m, IPV4_ADDR_RX)) {
+    while (std::regex_search(start_it, header.end(), m, IPV4_ADDR_RX)) {
         // get ip that matched
         std::string ip_str(m[0].first, m[0].second);
         // check if public network ip address
-        if (! boost::regex_match(ip_str, PRIVATE_NET_RX) ) {
+        if (! std::regex_match(ip_str, PRIVATE_NET_RX) ) {
             // match found!
             public_ip = ip_str;
             return true;

@@ -1,6 +1,7 @@
 // ---------------------------------------------------------------------
 // pion:  a Boost C++ framework for building lightweight HTTP interfaces
 // ---------------------------------------------------------------------
+// Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 // Copyright (C) 2007-2014 Splunk Inc.  (https://github.com/splunk/pion)
 //
 // Distributed under the Boost Software License, Version 1.0.
@@ -10,8 +11,6 @@
 #ifndef __PION_LOGSERVICE_HEADER__
 #define __PION_LOGSERVICE_HEADER__
 
-#include <boost/thread/mutex.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <pion/logger.hpp>
 #include <pion/http/plugin_service.hpp>
 #include <pion/http/response_writer.hpp>
@@ -73,7 +72,7 @@ private:
     std::list<std::string>                  m_log_events;
 
     /// mutex to make class thread-safe
-    boost::mutex                            m_log_mutex;
+    std::mutex                            m_log_mutex;
 
 #if defined(PION_USE_LOG4CXX)
     public:

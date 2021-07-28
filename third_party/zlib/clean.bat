@@ -1,0 +1,1 @@
+nmake clean -f win32\Makefile.msc
