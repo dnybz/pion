@@ -11,8 +11,8 @@
 #ifndef __PION_TCP_TIMER_HEADER__
 #define __PION_TCP_TIMER_HEADER__
 
-#include <asio.hpp>
 #include <pion/config.hpp>
+#include <asio.hpp>
 #include <pion/tcp/connection.hpp>
 
 

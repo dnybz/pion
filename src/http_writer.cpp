@@ -8,10 +8,8 @@
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <asio.hpp>
 #include <pion/http/writer.hpp>
 #include <pion/http/message.hpp>
-
 
 namespace pion {    // begin namespace pion
 namespace http {    // begin namespace http

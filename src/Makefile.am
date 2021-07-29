@@ -2,7 +2,7 @@
 # pion automake configuration file
 # --------------------------------
 
-AM_CPPFLAGS = -I../include
+AM_CPPFLAGS = -I../include -I../third_party -I../third_party/asio/include -I../third_party/zlib
 
 lib_LTLIBRARIES = libpion.la
 
@@ -12,7 +12,7 @@ libpion_la_SOURCES = \
 	tcp_server.cpp tcp_timer.cpp \
 	http_auth.cpp http_basic_auth.cpp http_cookie_auth.cpp http_message.cpp \
 	http_parser.cpp http_plugin_server.cpp http_reader.cpp http_server.cpp \
-	http_types.cpp http_writer.cpp
+	http_types.cpp http_writer.cpp string_utils.cpp
 
 libpion_la_LDFLAGS = -no-undefined -release $(PION_LIBRARY_VERSION)
 libpion_la_LIBADD = @PION_EXTERNAL_LIBS@

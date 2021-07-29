@@ -8,7 +8,6 @@
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <asio.hpp>
 #include <pion/admin_rights.hpp>
 #include <pion/tcp/server.hpp>
 

@@ -2,7 +2,7 @@
 # pion automake configuration file
 # --------------------------------
 
-AM_CPPFLAGS = -I../include
+AM_CPPFLAGS = -I../include -I../third_party -I../third_party/asio/include -I../third_party/zlib
 
 pion_pluginsdir = @PION_PLUGINS_DIRECTORY@
 pion_plugins_LTLIBRARIES = HelloService.la EchoService.la \

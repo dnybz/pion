@@ -11,13 +11,12 @@
 #ifndef __PION_HTTP_READER_HEADER__
 #define __PION_HTTP_READER_HEADER__
 
-#include <asio.hpp>
 #include <pion/config.hpp>
 #include <pion/http/parser.hpp>
 #include <pion/http/message.hpp>
 #include <pion/tcp/connection.hpp>
 #include <pion/tcp/timer.hpp>
-
+#include <asio.hpp>
 
 namespace pion {    // begin namespace pion
 namespace http {    // begin namespace http

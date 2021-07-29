@@ -46,7 +46,6 @@ AC_MSG_NOTICE([Using the embedded pion-common library])
 
 # Include pion-config.inc
 m4_include([build/pion-setup.inc])
-m4_include([build/pion-boost.inc])
 m4_include([build/pion-config.inc])
 
 # Output Makefiles

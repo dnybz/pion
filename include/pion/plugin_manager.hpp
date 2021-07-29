@@ -11,6 +11,7 @@
 #ifndef __PION_PLUGIN_MANAGER_HEADER__
 #define __PION_PLUGIN_MANAGER_HEADER__
 
+#include <iostream>
 #include <map>
 #include <string>
 #include <functional>

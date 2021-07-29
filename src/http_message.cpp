@@ -10,14 +10,12 @@
 
 #include <iostream>
 #include <algorithm>
-#include <asio.hpp>
 #include <regex>
 #include <pion/tribool.hpp>
 #include <pion/http/message.hpp>
 #include <pion/http/request.hpp>
 #include <pion/http/parser.hpp>
 #include <pion/tcp/connection.hpp>
-
 
 namespace pion {    // begin namespace pion
 namespace http {    // begin namespace http

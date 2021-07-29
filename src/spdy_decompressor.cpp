@@ -12,9 +12,8 @@
 #include <zlib.h>
 #include <iostream>
 #include <fstream>
-#include <asio/detail/socket_ops.hpp>
 #include <pion/spdy/decompressor.hpp>
-
+#include <asio/detail/socket_ops.hpp>
 
 namespace pion {    // begin namespace pion
 namespace spdy {    // begin namespace spdy 

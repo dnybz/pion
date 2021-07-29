@@ -9,12 +9,11 @@
 //
 
 #include <cstdlib>
-#include <asio/detail/socket_ops.hpp>
 #include <pion/algorithm.hpp>
 #include <pion/spdy/parser.hpp>
 #include <pion/spdy/decompressor.hpp>
 #include <pion/spdy/types.hpp>
-
+#include <asio/detail/socket_ops.hpp>
 
 namespace pion {    // begin namespace pion
 namespace spdy {    // begin namespace spdy

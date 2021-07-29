@@ -10,11 +10,11 @@
 
 #include <vector>
 #include <iostream>
-#include <asio.hpp>
 #include <pion/error.hpp>
 #include <pion/plugin.hpp>
 #include <pion/process.hpp>
 #include <pion/http/plugin_server.hpp>
+#include <asio.hpp>
 
 // these are used only when linking to static web service libraries
 // #ifdef PION_STATIC_LINKING

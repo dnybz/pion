@@ -15,6 +15,7 @@
 #include <string>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <pion/noncopyable.hpp>

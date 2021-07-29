@@ -29,7 +29,6 @@
 #include <string>
 #include <exception>
 #include <sstream>
-#include "pion/config.hpp"
 #include "pion/string_utils.hpp"
 
 namespace pion {

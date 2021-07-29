@@ -8,13 +8,13 @@
 // See http://www.boost.org/LICENSE_1_0.txt
 //
 
-#include <asio.hpp>
 
 #include "FileService.hpp"
 #include <pion/error.hpp>
 #include <pion/plugin.hpp>
 #include <pion/algorithm.hpp>
 #include <pion/http/response_writer.hpp>
+#include <asio.hpp>
 
 using namespace pion;
 

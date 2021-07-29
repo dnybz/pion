@@ -56,6 +56,9 @@
 #define PION_HAVE_UNORDERED_MAP 1
 #endif
 
+/* Define to ASIO Standalone. */
+#define ASIO_STANDALONE
+
 // -----------------------------------------------------------------------
 // Logging Options
 //

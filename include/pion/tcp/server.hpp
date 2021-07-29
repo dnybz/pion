@@ -11,14 +11,13 @@
 #ifndef __PION_TCP_SERVER_HEADER__
 #define __PION_TCP_SERVER_HEADER__
 
-#include <set>
-#include <asio.hpp>
-#include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 #include <pion/logger.hpp>
 #include <pion/scheduler.hpp>
+#include <pion/noncopyable.hpp>
 #include <pion/tcp/connection.hpp>
-
+#include <set>
+#include <asio.hpp>
 
 namespace pion {    // begin namespace pion
 namespace tcp {     // begin namespace tcp

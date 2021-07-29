@@ -38,6 +38,9 @@
 /* Define to 1 if you have the <unordered_map> header file. */
 #cmakedefine PION_HAVE_UNORDERED_MAP ${PION_HAVE_UNORDERED_MAP}
 
+
+/* Define to ASIO Standalone. */
+#define ASIO_STANDALONE
 // -----------------------------------------------------------------------
 // Logging Options
 //
@@ -75,8 +78,6 @@
     #endif
 #endif // _WIN32
 
-#include <boost/config.hpp>
-
 #ifdef _MSC_VER
     #ifdef PION_EXPORTS
         #define PION_API __declspec(dllexport)
@@ -108,5 +109,36 @@
     #define PION_PLUGIN
 
 #endif // _MSC_VER
+
+// http://stackoverflow.com/a/18387764/314015
+// Compliant C++11 compilers put noexcept specifiers on error_category
+// VS2013 is _MSC_VER 1800, VS2015 is _MSC_VER 1900
+#ifndef _MSC_VER
+#  define PION_NOEXCEPT noexcept
+#  define PION_NOEXCEPT_FALSE noexcept(false)
+#  define PION_NOEXCEPT_SUPPORTED
+#else
+#  if (_MSC_VER >= 1900)
+#    define PION_NOEXCEPT noexcept
+#    define PION_NOEXCEPT_FALSE noexcept(false)
+#    define PION_NOEXCEPT_SUPPORTED
+#  endif //(_MSC_VER >= 1900)
+#endif // _MSC_VER
+#ifndef PION_NOEXCEPT
+#  define PION_NOEXCEPT
+#  define PION_NOEXCEPT_FALSE
+#endif //!defined(PION_NOEXCEPT)
+
+#if defined(__cplusplus) && __cplusplus >= 201703L && defined(__has_include)
+#if __has_include(<filesystem>)
+#define GHC_USE_STD_FS
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+#endif
+#ifndef GHC_USE_STD_FS
+#include <ghc/filesystem.hpp>
+namespace fs = ghc::filesystem;
+#endif
 
 #endif //__PION_PIONCONFIG_HEADER__

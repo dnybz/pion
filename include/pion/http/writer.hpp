@@ -12,15 +12,15 @@
 #define __PION_HTTP_WRITER_HEADER__
 
 #include <vector>
+#include <list>
 #include <string>
-#include <asio.hpp>
 #include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 #include <pion/logger.hpp>
 #include <pion/tcp/connection.hpp>
 #include <pion/http/message.hpp>
 #include <pion/noncopyable.hpp>
-
+#include <asio.hpp>
 
 namespace pion {    // begin namespace pion
 namespace http {    // begin namespace http

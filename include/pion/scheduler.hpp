@@ -14,11 +14,10 @@
 #include <vector>
 #include <stdint.h>
 #include <thread>
-#include <asio.hpp>
 #include <pion/noncopyable.hpp>
 #include <pion/config.hpp>
 #include <pion/logger.hpp>
-
+#include <asio.hpp>
 
 namespace pion {    // begin namespace pion
 

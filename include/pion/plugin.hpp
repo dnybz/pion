@@ -11,6 +11,7 @@
 #ifndef __PION_PLUGIN_HEADER__
 #define __PION_PLUGIN_HEADER__
 
+#include <iostream>
 #include <vector>
 #include <string>
 #include <map>

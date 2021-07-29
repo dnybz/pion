@@ -13,7 +13,6 @@
 #include <pion/logger.hpp>
 #include <sstream>
 #include <iostream>
-#include <xiosbase>
 #include <signal.h>
 #include <time.h>
 #ifndef PION_WIN32

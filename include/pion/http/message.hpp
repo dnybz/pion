@@ -15,11 +15,10 @@
 #include <vector>
 #include <cstring>
 #include <regex>
-#include <asio.hpp>
 #include <pion/string_utils.hpp>
 #include <pion/config.hpp>
 #include <pion/http/types.hpp>
-
+#include <asio.hpp>
 
 namespace pion {    // begin namespace pion
 namespace tcp {
