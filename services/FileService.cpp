@@ -51,20 +51,23 @@ void FileService::set_option(const std::string& name, const std::string& value)
         //m_directory.normalize();
         plugin::check_cygwin_path(m_directory, value);
         // make sure that the directory exists
-        if (! fs::exists(m_directory) || ! fs::is_directory(m_directory)) {
-            const std::string dir_name = m_directory.string();
+		std::error_code ec;
+		if (!fs::exists(m_directory, ec) || !fs::is_directory(m_directory, ec)) {
+			const std::string dir_name = m_directory.string();
+			std::cout << "Directory not found: " << dir_name << std::endl;
+			m_directory.clear();
+		}
 
-            //BOOST_THROW_EXCEPTION( error::directory_not_found() << error::errinfo_dir_name(dir_name) );
-        }
     } else if (name == "file") {
         m_file = value;
         plugin::check_cygwin_path(m_file, value);
-        // make sure that the directory exists
-        if (! fs::exists(m_file) || fs::is_directory(m_file)) {
-            const std::string file_name = m_file.string();
-
-            //BOOST_THROW_EXCEPTION( error::file_not_found() << error::errinfo_file_name(file_name) );
-        }
+		// make sure that the directory exists
+		std::error_code ec;
+		if (!fs::exists(m_file, ec) || fs::is_directory(m_file, ec)) {
+			const std::string file_name = m_file.string();
+			std::cout << "File not found: " << file_name << std::endl;
+			m_file.clear();
+		}
     } else if (name == "cache") {
         if (value == "0") {
             m_cache_setting = 0;
