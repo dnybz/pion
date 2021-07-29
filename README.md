@@ -18,7 +18,7 @@ Building the code
 
 *For Visual Studio 2017 or later:* use `pion.sln`
 1. Download openssl http://slproweb.com/download/Win32OpenSSL-1_1_1k.exe
-2. Install Win32OpenSSL_Light-1_1_1k.exe to C:\OpenSSL-Win32
+2. Install Win32OpenSSL-1_1_1k.exe to C:\OpenSSL-Win32
 3. Use the vs command line "Developer Command Prompt for VS 2017" to compile pion\third_party\zlib\build.bat
 4. Use the vs2017 open `pion.sln` to do just it
 
