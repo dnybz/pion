@@ -63,8 +63,9 @@ void plugin::add_plugin_directory(const std::string& dir)
 {
     fs::path plugin_path = dir;
     check_cygwin_path(plugin_path, dir);
-	if (!fs::exists(plugin_path))
-		std::cout << "directory_not_found: " << dir << std::endl;
+	if (!fs::exists(plugin_path)) {
+		std::cout << "Directory not found: " << dir << std::endl;
+	}
     config_type& cfg = get_plugin_config();
     std::unique_lock<std::mutex> plugin_lock(cfg.m_plugin_mutex);
     cfg.m_plugin_dirs.push_back(plugin_path.string());
@@ -95,8 +96,9 @@ void plugin::open(const std::string& plugin_name)
     // nope, look for shared library file
     std::string plugin_file;
 
-    if (!find_plugin_file(plugin_file, plugin_name))
-		std::cout << "plugin_not_found: " << plugin_name << std::endl;
+	if (!find_plugin_file(plugin_file, plugin_name)) {
+		std::cout << "Plugin not found: " << plugin_name << std::endl;
+	}
         
     open_file(plugin_file);
 }
@@ -258,7 +260,7 @@ void plugin::open_plugin(const std::string& plugin_file,
 			std::cout << "open_plugin: " << plugin_data.m_plugin_name << error_str  << std::endl;
         } else
 #endif
-		std::cout << "open_plugin: " << plugin_data.m_plugin_name << std::endl;
+		std::cout << "Open plugin: " << plugin_data.m_plugin_name << std::endl;
     }
     
     // find the function used to create new plugin objects
@@ -267,7 +269,7 @@ void plugin::open_plugin(const std::string& plugin_file,
                          PION_PLUGIN_CREATE + plugin_data.m_plugin_name);
     if (plugin_data.m_create_func == NULL) {
         close_dynamic_library(plugin_data.m_lib_handle);
-		std::cout << "plugin_missing_symbol: " << plugin_data.m_plugin_name << "" << PION_PLUGIN_CREATE + plugin_data.m_plugin_name << std::endl;
+		std::cout << "Plugin missing symbol: " << plugin_data.m_plugin_name << "" << PION_PLUGIN_CREATE + plugin_data.m_plugin_name << std::endl;
     }
 
     // find the function used to destroy existing plugin objects
@@ -276,7 +278,7 @@ void plugin::open_plugin(const std::string& plugin_file,
                          PION_PLUGIN_DESTROY + plugin_data.m_plugin_name);
     if (plugin_data.m_destroy_func == NULL) {
         close_dynamic_library(plugin_data.m_lib_handle);
-		std::cout << "plugin_missing_symbol: " << plugin_data.m_plugin_name << "" << PION_PLUGIN_DESTROY + plugin_data.m_plugin_name << std::endl;
+		std::cout << "Plugin missing symbol: " << plugin_data.m_plugin_name << "" << PION_PLUGIN_DESTROY + plugin_data.m_plugin_name << std::endl;
     }
 }
 

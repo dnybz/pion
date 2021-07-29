@@ -55,14 +55,14 @@ void plugin_server::load_service_config(const std::string& config_name)
 {
     std::string config_file;
 	if (!plugin::find_config_file(config_file, config_name)) {
-		std::cout << "file_not_found: " << config_name << std::endl;
+		std::cout << "File not found: " << config_name << std::endl;
 	}
 
     // open the file for reading
     std::ifstream config_stream;
     config_stream.open(config_file.c_str(), std::ios::in);
 	if (!config_stream.is_open()) {
-		std::cout << "open_file: " << config_name << std::endl;
+		std::cout << "Can't open file: " << config_name << std::endl;
 	}
     
     // parse the contents of the file
@@ -91,7 +91,7 @@ void plugin_server::load_service_config(const std::string& config_name)
                 // ignore case for commands
                 command_string += tolower(c);
             } else if (c != '\r' && c != '\n') {    // check for blank lines
-				std::cout << "bad_config: " << config_name << std::endl;
+				std::cout << "bad config: " << config_name << " blank lines" << std::endl;
             }
             break;
             
@@ -109,11 +109,11 @@ void plugin_server::load_service_config(const std::string& config_name)
                     username_string.clear();
                     parse_state = PARSE_USERNAME;
                 } else {
-					std::cout << "bad_config: " << config_name << std::endl;
+					std::cout << "bad config: " << config_name << std::endl;
                 }
             } else if (! isalpha(c)) {
                 // commands may only contain alpha chars
-				std::cout << "bad_config: " << config_name << std::endl;
+				std::cout << "bad config: " << config_name << " only contain alpha chars." << std::endl;
             } else {
                 // ignore case for commands
                 command_string += tolower(c);
@@ -131,7 +131,7 @@ void plugin_server::load_service_config(const std::string& config_name)
                 }
             } else if (c == '\r' || c == '\n') {
                 // line truncated before value
-				std::cout << "bad_config: " << config_name << std::endl;
+				std::cout << "bad config: " << config_name << " line truncated before value" << std::endl;
             } else {
                 // add char to resource
                 resource_string += c;
@@ -149,7 +149,7 @@ void plugin_server::load_service_config(const std::string& config_name)
                 }
             } else if (c == '\r' || c == '\n') {
                 // line truncated before value (missing username)
-				std::cout << "bad_config: " << config_name << std::endl;
+				std::cout << "bad config: " << config_name << " line truncated before value (missing username)" << std::endl;
             } else {
                 // add char to username
                 username_string += c;
@@ -162,7 +162,7 @@ void plugin_server::load_service_config(const std::string& config_name)
                 // value is finished
                 if (value_string.empty()) {
                     // value must not be empty
-					std::cout << "bad_config: " << config_name << std::endl;
+					std::cout << "bad config: " << config_name << "value is empty" << std::endl;
                 } else if (command_string == "path") {
                     // finished path command
                     try { plugin::add_plugin_directory(value_string); }
@@ -180,25 +180,27 @@ void plugin_server::load_service_config(const std::string& config_name)
                     }
                     else {
                         // only basic and cookie authentications are supported
-                        std::cout << "bad_config: " << config_name << std::endl;
+                        std::cout << "bad config: " << config_name << "Not support name: " << command_string << "value: " << value_string << std::endl;
                     }
                 } else if (command_string == "restrict") {
                     // finished restrict command
                     if (! my_auth_ptr)
                         // Authentication type must be defined before restrict
-                        std::cout << "bad_config: " << config_name << std::endl;
+                        std::cout << "bad config: " << config_name << " Authentication type must be defined before restrict" << std::endl;
                     else if (value_string.empty())
                         // No service defined for restrict parameter
-                        std::cout << "bad_config: " << config_name << std::endl;
+                        std::cout << "bad config: " << config_name << " No service defined for restrict parameter" << std::endl;
                     my_auth_ptr->add_restrict(value_string);
                 } else if (command_string == "user") {
                     // finished user command
-                    if (! my_auth_ptr)
-                        // Authentication type must be defined before users
-                        std::cout << "bad_config: " << config_name << std::endl;
-                    else if (value_string.empty())
-                        // No password defined for user parameter
-                        std::cout << "bad_config: " << config_name << std::endl;
+					if (!my_auth_ptr) {
+						// Authentication type must be defined before users
+						std::cout << "bad config: " << config_name << " Authentication type must be defined before users" << std::endl;
+					}
+					else if (value_string.empty()) {
+						// No password defined for user parameter
+						std::cout << "bad config: " << config_name << " No password defined for user parameter" << std::endl;
+					}
                     my_auth_ptr->add_user(username_string, value_string);
                 } else if (command_string == "service") {
                     // finished service command
@@ -206,8 +208,9 @@ void plugin_server::load_service_config(const std::string& config_name)
                 } else if (command_string == "option") {
                     // finished option command
                     std::string::size_type pos = value_string.find('=');
-                    if (pos == std::string::npos)
-                        std::cout << "bad_config: " << config_name << std::endl;
+					if (pos == std::string::npos) {
+						std::cout << "bad config: " << config_name << " " << value_string << std::endl;
+					}
                     option_name_string = value_string.substr(0, pos);
                     option_value_string = value_string.substr(pos + 1);
                     set_service_option(resource_string, option_name_string,
