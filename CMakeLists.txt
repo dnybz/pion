@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------
 # pion:  a Boost C++ framework for building lightweight HTTP interfaces
 # ---------------------------------------------------------------------
+# Copyright (C) 2021 Wang Qiang  (https://github.com/dnybz/pion)
 # Copyright (C) 2013 Splunk Inc.  (https://github.com/splunk/pion)
 #
 # Distributed under the Boost Software License, Version 1.0.
@@ -25,7 +26,6 @@ set(CMAKE_MODULE_PATH ${PION_SRC_ROOT}/cmake ${CMAKE_MODULE_PATH})
 
 include(PionUtils)
 
-enforce_out_of_source("${PROJECT_NAME} required out-of-source build. Use 'cmake <path to source>'")
 pion_get_version("${PION_SRC_ROOT}" PION_V_MAJOR PION_V_MINOR PION_V_PATCH)
 pion_update_compilation_opts()
 
@@ -73,7 +73,7 @@ endif()
 
 # make include globaly visible
 set(PROJECT_WIDE_INCLUDE ${PION_SRC_ROOT}/include)
-include_directories(${PROJECT_WIDE_INCLUDE})
+include_directories(${PROJECT_WIDE_INCLUDE} ${PION_SRC_ROOT}/third_party ${PION_SRC_ROOT}/third_party/zlib ${PION_SRC_ROOT}/third_party/asio/include)
 
 find_package(Threads REQUIRED)
 
