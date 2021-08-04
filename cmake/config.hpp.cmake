@@ -39,9 +39,6 @@
 /* Define to 1 if you have the <unordered_map> header file. */
 #cmakedefine PION_HAVE_UNORDERED_MAP ${PION_HAVE_UNORDERED_MAP}
 
-
-/* Define to ASIO Standalone. */
-#define ASIO_STANDALONE
 // -----------------------------------------------------------------------
 // Logging Options
 //
@@ -119,6 +116,7 @@
 #  define PION_NOEXCEPT_FALSE noexcept(false)
 #  define PION_NOEXCEPT_SUPPORTED
 #else
+#include <WinSock2.h>
 #  if (_MSC_VER >= 1900)
 #    define PION_NOEXCEPT noexcept
 #    define PION_NOEXCEPT_FALSE noexcept(false)

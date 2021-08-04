@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
 set(PROJECT_NAME utils)
 project(${PROJECT_NAME} CXX)
 
+add_definitions(-DASIO_STANDALONE)
+
 message("BUILD_PIOND = ${BUILD_PIOND}")
 if (BUILD_PIOND)
     set(PIOND_SRC_FILES piond.cpp)

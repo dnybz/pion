@@ -16,6 +16,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <mutex>
 #include <pion/config.hpp>
 #include <pion/error.hpp>
 #include <pion/noncopyable.hpp>

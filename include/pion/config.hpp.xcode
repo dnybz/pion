@@ -43,9 +43,6 @@
 /* Define to 1 if you have the <unordered_map> header file. */
 /* #undef PION_HAVE_UNORDERED_MAP */
 
-/* Define to ASIO Standalone. */
-#define ASIO_STANDALONE
-
 // -----------------------------------------------------------------------
 // Logging Options
 //
@@ -79,20 +76,6 @@
 #define PION_API
 #define PION_PLUGIN
 
-// http://stackoverflow.com/a/18387764/314015
-// Compliant C++11 compilers put noexcept specifiers on error_category
-// VS2013 is _MSC_VER 1800, VS2015 is _MSC_VER 1900
-#ifndef _MSC_VER
-#  define PION_NOEXCEPT noexcept
-#  define PION_NOEXCEPT_FALSE noexcept(false)
-#  define PION_NOEXCEPT_SUPPORTED
-#else
-#  if (_MSC_VER >= 1900)
-#    define PION_NOEXCEPT noexcept
-#    define PION_NOEXCEPT_FALSE noexcept(false)
-#    define PION_NOEXCEPT_SUPPORTED
-#  endif //(_MSC_VER >= 1900)
-#endif // _MSC_VER
 #ifndef PION_NOEXCEPT
 #  define PION_NOEXCEPT
 #  define PION_NOEXCEPT_FALSE

@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
-set(PROJECT_NAME pion_solution)
+set(PROJECT_NAME pion)
 project(${PROJECT_NAME} CXX C)
 
 #-------------------------------------------------
@@ -18,7 +18,7 @@ project(${PROJECT_NAME} CXX C)
 # src root path
 set(PION_SRC_ROOT ${PROJECT_SOURCE_DIR} CACHE PATH "Pion source root")
 # binary output by default
-set(COMMON_BIN_PATH ${CMAKE_BINARY_DIR}/Bin)
+set(COMMON_BIN_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${COMMON_BIN_PATH}/${CMAKE_BUILD_TYPE})
 set(EXECUTABLE_OUTPUT_PATH ${COMMON_BIN_PATH}/${CMAKE_BUILD_TYPE})
 # set where to find additional cmake modules if any
@@ -149,7 +149,7 @@ include_directories(${COMMON_BIN_PATH})
 
 # TODO: handle #pragma comment, which is hardcoded in config.hpp
 # need to generate config.hpp by ourselfs
-add_definitions(-DPION_CMAKE_BUILD)
+add_definitions(-DPION_CMAKE_BUILD -DASIO_STANDALONE)
 
 if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DPION_STATIC_LINKING)

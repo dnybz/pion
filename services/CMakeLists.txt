@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 2.8.10 FATAL_ERROR)
 set(PROJECT_NAME services)
 project(${PROJECT_NAME} CXX)
 
+add_definitions(-DASIO_STANDALONE)
+
 # get all *.cpp files from src to build target
 file(GLOB SRC_FILES ${PROJECT_SOURCE_DIR}/*.cpp)
 
