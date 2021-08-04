@@ -141,7 +141,7 @@ int main (int argc, char *argv[])
         try { plugin::add_plugin_directory(fs::path(argv[0]).parent_path().string()); }
         catch (...) {
             PION_LOG_WARN(main_log, "Directory of current executable does not exist: "
-                << fs::path(argv[0]).parent_path());
+                << fs::path(argv[0]).parent_path().string());
         }
 
         // create a server for HTTP & add the Hello Service

@@ -78,8 +78,8 @@
     #include <log4cplus/loglevel.h>
     #include <log4cplus/loggingmacros.h>
 
-    #include <boost/circular_buffer.hpp>
-    #include <boost/thread/mutex.hpp>
+	#include <circular_buffer_stl/include/circular_buffer.hpp>
+    #include <mutex>
 
     #if defined(_MSC_VER) && !defined(PION_CMAKE_BUILD)
         #if defined _DEBUG
@@ -108,7 +108,7 @@
         class circular_buffer_appender : public log4cplus::Appender
         {
         public:
-            typedef boost::circular_buffer<log4cplus::spi::InternalLoggingEvent> LogEventBuffer;
+            typedef cb::circular_buffer<log4cplus::spi::InternalLoggingEvent> LogEventBuffer;
 
             // default constructor and destructor
             circular_buffer_appender(void) : m_log_events(1000) {};

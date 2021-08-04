@@ -12,10 +12,8 @@
 
 #if defined(PION_USE_LOG4CXX)
     #include <log4cxx/spi/loggingevent.h>
-    #include <boost/lexical_cast.hpp>
 #elif defined(PION_USE_LOG4CPLUS)
     #include <log4cplus/spi/loggingevent.h>
-    #include <boost/lexical_cast.hpp>
 #elif defined(PION_USE_LOG4CPP)
     #include <log4cpp/BasicLayout.hh>
 #endif
@@ -73,7 +71,7 @@ void LogServiceAppender::append(const log4cxx::spi::LoggingEventPtr& event)
 void LogServiceAppender::append(const log4cplus::spi::InternalLoggingEvent& event)
 {
     // custom layouts is not supported for log4cplus library
-    std::string formatted_string(std::to_string(event.getTimestamp().sec()));
+    std::string formatted_string(log4cplus::helpers::getFormattedTime(LOG4CPLUS_TEXT("%Y-%m-%d %H:%M:%S"), event.getTimestamp(), false));
     formatted_string += ' ';
     formatted_string += m_log_level_manager.toString(event.getLogLevel());
     formatted_string += ' ';

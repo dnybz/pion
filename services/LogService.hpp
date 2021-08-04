@@ -108,7 +108,7 @@ private:
         virtual void _append(const log4cpp::LoggingEvent& event);
     private:
         /// the logging layout used to format events
-        boost::scoped_ptr<log4cpp::Layout>      m_layout_ptr;
+		std::unique_lock<log4cpp::Layout>      m_layout_ptr;
 #endif
 
 };
